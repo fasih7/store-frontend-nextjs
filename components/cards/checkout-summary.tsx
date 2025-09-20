@@ -38,7 +38,7 @@ export default function CheckoutSummaryCard() {
         </div>
         <div className="space-y-2">
           {items.map((item) => (
-            <div key={item._id} className="flex items-center gap-2">
+            <div key={item.id} className="flex items-center gap-2">
               <PackageIcon className="h-5 w-5 text-gray-500" />
               <span>
                 {item.quantity} x {item.title}

@@ -86,7 +86,7 @@ export default function CartSheet() {
                         variant="outline"
                         size="icon"
                         onClick={() =>
-                          updateQuantity(item._id, (item.quantity ?? 1) - 1)
+                          updateQuantity(item.id, (item.quantity ?? 1) - 1)
                         }
                         className="rounded-none rounded-l-lg h-10"
                       >
@@ -103,7 +103,7 @@ export default function CartSheet() {
                         variant="outline"
                         size="icon"
                         onClick={() =>
-                          updateQuantity(item._id, (item.quantity ?? 1) + 1)
+                          updateQuantity(item.id, (item.quantity ?? 1) + 1)
                         }
                         className="rounded-none rounded-r-lg h-10"
                       >
@@ -111,7 +111,7 @@ export default function CartSheet() {
                       </Button>
                     </div>
                     <Button
-                      onClick={() => removeFromCart(item._id)}
+                      onClick={() => removeFromCart(item.id)}
                       variant="ghost"
                       size="icon"
                     >

@@ -33,7 +33,7 @@ function Categories() {
         {/* Display the categories in a grid. */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {categories.map((category) => (
-            <CategoryCard key={category._id} category={category} />
+            <CategoryCard key={category.id} category={category} />
           ))}
         </div>
       </div>

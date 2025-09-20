@@ -11,7 +11,8 @@ function FeaturedProducts() {
     async function fetchProducts() {
       try {
         const allProducts = await productGateway.getFeaturedProducts();
-        setFeaturedProducts(allProducts.products);
+        console.log("all featured: ", allProducts[0].products);
+        setFeaturedProducts(allProducts[0].products);
       } catch (error) {
         console.error("Failed to load products", error);
       } finally {

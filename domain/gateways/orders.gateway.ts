@@ -8,7 +8,7 @@ export class OrdersGateway extends HttpClient {
 
   async submitOrder(params: OrderDetails) {
     const response = await this.post("", params);
-    return response._id;
+    return response.id;
   }
 
   async getOrderById(id: string) {

@@ -79,7 +79,7 @@ export default function SingleProductPage({
 
               {/* The product price */}
               <p className="text-xl text-gray-800 font-semibold">
-                ${product?.price.toFixed(2)}
+                ${product?.price}
               </p>
 
               {/* The product description */}

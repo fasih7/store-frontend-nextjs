@@ -19,6 +19,7 @@ A clean, modern e-commerce website built with Next.js, Tailwind CSS, and shadcn/
 ## 🚀 Features
 
 ### Core Functionality
+
 - **Product Catalog**: Browse products with detailed information and images
 - **Advanced Search**: Full-text search with filtering by category and price range
 - **Shopping Cart**: Add/remove items with persistent storage using localStorage
@@ -26,12 +27,14 @@ A clean, modern e-commerce website built with Next.js, Tailwind CSS, and shadcn/
 - **Responsive Design**: Optimized for mobile, tablet, and desktop devices
 
 ### User Interface
+
 - **Clean Design**: Minimalist aesthetic with focus on product presentation
 - **shadcn/ui Components**: Consistent, accessible UI components
 - **Mobile-First**: Responsive design that works seamlessly across all devices
 - **Loading States**: Smooth transitions and loading indicators
 
 ### Technical Features
+
 - **Next.js App Router**: Modern routing with file-based navigation
 - **TypeScript**: Full type safety throughout the application
 - **Form Validation**: Robust form handling with React Hook Form and Zod
@@ -49,12 +52,14 @@ A clean, modern e-commerce website built with Next.js, Tailwind CSS, and shadcn/
 ## 📦 Installation
 
 ### Prerequisites
-- Node.js 18+ 
+
+- Node.js 18+
 - npm, yarn, or pnpm
 
 ### Setup Instructions
 
 1. **Clone or download the project**
+
    ```bash
    # If using git
    git clone https://github.com/Mo-Ibra/nextjs-clean-ecommerce
@@ -62,6 +67,7 @@ A clean, modern e-commerce website built with Next.js, Tailwind CSS, and shadcn/
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    # or
@@ -71,6 +77,7 @@ A clean, modern e-commerce website built with Next.js, Tailwind CSS, and shadcn/
    ```
 
 3. **Run the development server**
+
    ```bash
    npm run dev
    # or
@@ -85,29 +92,34 @@ A clean, modern e-commerce website built with Next.js, Tailwind CSS, and shadcn/
 ## 🎯 Key Pages
 
 ### Homepage (`/`)
+
 - Hero section with call-to-action
 - Featured product showcase
 - Category navigation
 - Newsletter signup
 
 ### Products (`/products`)
+
 - Complete product listing
 - Product cards with images and pricing
 - Links to individual product pages
 
 ### Product Detail (`/products/[id]`)
+
 - Detailed product information
 - High-quality product images
 - Add to cart functionality
 - Product specifications
 
 ### Search (`/search`)
+
 - Advanced search functionality
 - Category and price filtering
 - Real-time results
 - Mobile-friendly filter panel
 
 ### Checkout (Coming Soon) (`/checkout`)
+
 - Multi-step checkout process
 - Shipping information form
 - Payment method selection
@@ -144,15 +156,18 @@ The application is fully responsive with:
 ## 🎨 Customization
 
 ### Styling
+
 - Update `app/globals.css` for global styles
 - shadcn/ui components can be customized in `components/ui/`
 
 ### Data
+
 - Product data is stored in `lib/data.ts`
 - Add new products by extending the products array
 - Categories can be modified in the same file
 
 ### Components
+
 - All components are modular and reusable
 - Located in `components/` directory
 - Follow TypeScript interfaces defined in `lib/types.ts`
@@ -160,12 +175,15 @@ The application is fully responsive with:
 ## 🚀 Deployment
 
 ### Vercel (Recommended)
+
 1. Push your code to a Git repository
 2. Connect your repository to [Vercel](https://vercel.com)
 3. Deploy with zero configuration
 
 ### Other Platforms
+
 The application can be deployed to any platform that supports Next.js:
+
 - Netlify
 - AWS Amplify
 - Railway
@@ -178,7 +196,7 @@ Currently, the application doesn't require environment variables for basic funct
 ```env
 # Example environment variables
 NEXT_PUBLIC_SITE_URL=https://yourstore.com
-NEXT_PUBLIC_ANALYTICS_ID=your-analytics-id
+NEXT_PUBLIC_ANALYTICSid=your-analytics-id
 ```
 
 ## 📈 Performance Optimization

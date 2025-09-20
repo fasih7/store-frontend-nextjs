@@ -130,8 +130,9 @@ export default function CheckoutForm({
       ...orderDetails,
       userId: user?.id, // Include user ID for logged-in users
       items: items.map((item) => ({
-        productId: item._id,
+        productId: item.id,
         quantity: item.quantity,
+        price: +item.price,
       })),
       totalPrice: items.reduce(
         (sum, item) => sum + +item.price * (item.quantity ?? 1),
@@ -154,7 +155,7 @@ export default function CheckoutForm({
         ...orderDetails,
         token: otpValue,
         items: items.map((item) => ({
-          productId: item._id,
+          productId: item.id,
           quantity: item.quantity,
         })),
         totalPrice: items.reduce(

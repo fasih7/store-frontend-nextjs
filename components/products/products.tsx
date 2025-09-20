@@ -67,7 +67,7 @@ function Products() {
         // Get selected category ids for query
         const selectedCateoryIds = categories
           .filter((category) => selectedCategories.includes(category.name))
-          .map((category) => category._id)
+          .map((category) => category.id)
           .join(",");
 
         const allProducts = await productGateway.getManyProducts({
@@ -157,7 +157,7 @@ function Products() {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {products.map((product) => (
-                    <ProductCard key={product._id} product={product} />
+                    <ProductCard key={product.id} product={product} />
                   ))}
                 </div>
               )}
