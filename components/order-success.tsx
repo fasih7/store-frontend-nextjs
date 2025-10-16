@@ -94,10 +94,10 @@ export default async function OrderSuccess({
                     quantity: number;
                     title: string;
                     price: number;
-                    _id: string;
+                    id: string;
                   }) => (
                     <div
-                      key={item._id}
+                      key={item.id}
                       className="flex justify-between items-center py-2"
                     >
                       <div className="flex-1">

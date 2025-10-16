@@ -20,7 +20,7 @@ function ProductCard({ product }: Readonly<ProductCardProps>) {
   return (
     <Card className="overflow-hidden py-0 gap-0">
       {/* Link to the product's detail page */}
-      <Link href={`/products/${product._id}`}>
+      <Link href={`/products/${product.id}`}>
         <div className="aspect-square relative overflow-hidden bg-gray-100 group-hover:opacity-75">
           {/* <Image will change back to it with local images */}
           <img
@@ -33,7 +33,7 @@ function ProductCard({ product }: Readonly<ProductCardProps>) {
       </Link>
       <CardContent className="px-4">
         {/* Product name linking to its detail page */}
-        <Link href={`/products/${product._id}`}>
+        <Link href={`/products/${product.id}`}>
           <h3 className="font-medium mt-2 text-lg">{product.title}</h3>
         </Link>
         {/* <p className="text-sm text-gray-500 mt-1">{product.category}</p> */}

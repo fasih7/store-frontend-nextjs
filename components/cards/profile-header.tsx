@@ -3,8 +3,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Package, Settings, Edit, Calendar } from "lucide-react";
+import { getReadableDate } from "../../shared/helpers";
 
-export default function ProfileHeader({ user }: any) {
+export default function ProfileHeader({ user, totalOrders }: any) {
   return (
     <Card className="mb-8">
       <CardContent className="pt-6">
@@ -38,11 +39,11 @@ export default function ProfileHeader({ user }: any) {
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
-                Member since March 2023
+                {getReadableDate(new Date(user?.createdAt))}
               </div>
               <div className="flex items-center gap-1">
                 <Package className="w-4 h-4" />
-                24 orders
+                {totalOrders} orders
               </div>
             </div>
           </div>

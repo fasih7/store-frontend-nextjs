@@ -9,16 +9,49 @@ import WishlistTab from "@/components/tabs/wishlist-tab";
 import { Tabs } from "@/components/ui/tabs";
 import { userGateway } from "@/domain/gateways/user.gateway";
 import { useEffect, useState } from "react";
+import { ordersGateway } from "../domain/gateways/orders.gateway";
 
 export default function ProfilePageComponent() {
   const [user, setUser] = useState(null);
+  const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [totalOrders, setTotalOrders] = useState<number | null>(null);
+
+  const handleAddressAdded = async (newAddress: any) => {
+    // Refresh the addresses list
+    try {
+      const updatedAddresses =
+        await userGateway.getSavedAddressForCurrentUser();
+      setSavedAddresses(updatedAddresses);
+    } catch (error) {
+      console.error("Error refreshing addresses:", error);
+    }
+  };
+
+  const handleAddressDeleted = async (addressId: string) => {
+    // Refresh the addresses list after deletion
+    try {
+      const updatedAddresses =
+        await userGateway.getSavedAddressForCurrentUser();
+      setSavedAddresses(updatedAddresses);
+    } catch (error) {
+      console.error("Error refreshing addresses:", error);
+    }
+  };
 
   useEffect(() => {
     async function fetchCurrentUser() {
       try {
-        const result = await userGateway.getCurrentUser();
-        console.log({ result });
-        setUser(result);
+        const [userDetails, userOrders, userAddresses] = await Promise.all([
+          userGateway.getCurrentUser(),
+          ordersGateway.getCurrentUserOrders(),
+          userGateway.getSavedAddressForCurrentUser(),
+        ]);
+
+        setUser(userDetails);
+        setSavedAddresses(userAddresses);
+        setOrders(userOrders.data);
+        setTotalOrders(userOrders.total);
       } catch (error: any) {
         const parsedError = JSON.parse(error.message);
         console.log("parsedError: ", parsedError);
@@ -37,20 +70,27 @@ export default function ProfilePageComponent() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Profile Header */}
-        <ProfileHeader user={user} />
+        <ProfileHeader user={user} totalOrders={totalOrders} />
 
         {/* Main Content */}
         <Tabs defaultValue="orders" className="space-y-6">
           <ProfileTabs />
 
           {/* Orders Tab */}
-          <OrdersTab />
+          <OrdersTab orders={orders} />
 
           {/* Profile Tab */}
           <ProfileTabContent user={user} />
 
           {/* Addresses Tab */}
-          <AddressTab />
+          {user && (
+            <AddressTab
+              savedAddresses={savedAddresses}
+              user={user}
+              onAddressAdded={handleAddressAdded}
+              onAddressDeleted={handleAddressDeleted}
+            />
+          )}
 
           {/* Payment Tab */}
           <PaymentTab />

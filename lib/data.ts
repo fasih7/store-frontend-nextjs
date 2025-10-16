@@ -2,7 +2,7 @@ import { Product, Category } from "./types";
 
 const products: Product[] = [
   {
-    _id: "1",
+    id: "1",
     title: "Minimal Desk Lamp",
     description: "A sleek, adjustable desk lamp with minimalist design.",
     price: 49.99,
@@ -10,7 +10,7 @@ const products: Product[] = [
     category: "Home Decor",
   },
   {
-    _id: "2",
+    id: "2",
     title: "Ergonomic Office Chair",
     description:
       "Comfortable office chair with lumbar support and adjustable height.",
@@ -19,7 +19,7 @@ const products: Product[] = [
     category: "Furniture",
   },
   {
-    _id: "3",
+    id: "3",
     title: "Wireless Earbuds",
     description: "Premium wireless earbuds with noise cancellation.",
     price: 129.99,
@@ -27,7 +27,7 @@ const products: Product[] = [
     category: "Electronics",
   },
   {
-    _id: "4",
+    id: "4",
     title: "Ceramic Coffee Mug",
     description: "Handcrafted ceramic mug with minimalist design.",
     price: 24.99,
@@ -35,7 +35,7 @@ const products: Product[] = [
     category: "Kitchen",
   },
   {
-    _id: "5",
+    id: "5",
     title: "Leather Wallet",
     description: "Genuine leather wallet with multiple card slots.",
     price: 59.99,
@@ -43,7 +43,7 @@ const products: Product[] = [
     category: "Accessories",
   },
   {
-    _id: "6",
+    id: "6",
     title: "Smart Watch",
     description: "Feature-rich smartwatch with health tracking capabilities.",
     price: 249.99,
@@ -51,7 +51,7 @@ const products: Product[] = [
     category: "Electronics",
   },
   {
-    _id: "7",
+    id: "7",
     title: "Cotton T-Shirt",
     description: "Premium cotton t-shirt with a comfortable fit.",
     price: 29.99,
@@ -59,7 +59,7 @@ const products: Product[] = [
     category: "Clothing",
   },
   {
-    _id: "8",
+    id: "8",
     title: "Bluetooth Speaker",
     description: "Portable bluetooth speaker with rich sound quality.",
     price: 79.99,
@@ -70,37 +70,37 @@ const products: Product[] = [
 
 const categories: Category[] = [
   {
-    _id: "1",
+    id: "1",
     name: "Electronics",
     slug: "electronics",
     image: "/placeholder/300x300.svg",
   },
   {
-    _id: "2",
+    id: "2",
     name: "Clothing",
     slug: "clothing",
     image: "/placeholder/300x300.svg",
   },
   {
-    _id: "3",
+    id: "3",
     name: "Home Decor",
     slug: "home-decor",
     image: "/placeholder/300x300.svg",
   },
   {
-    _id: "4",
+    id: "4",
     name: "Furniture",
     slug: "furniture",
     image: "/placeholder/300x300.svg",
   },
   {
-    _id: "5",
+    id: "5",
     name: "Kitchen",
     slug: "kitchen",
     image: "/placeholder/300x300.svg",
   },
   {
-    _id: "6",
+    id: "6",
     name: "Accessories",
     slug: "accessories",
     image: "/placeholder/300x300.svg",
@@ -132,7 +132,7 @@ export function getFeaturedProducts(): Product[] {
  */
 export function getProductById(id: string): Product | undefined {
   // Find and return the product with the matching id
-  return products.find((product) => product._id === id);
+  return products.find((product) => product.id === id);
 }
 
 /**

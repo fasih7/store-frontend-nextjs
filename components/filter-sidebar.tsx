@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/accordion";
 import { Category } from "@/lib/types";
 
-interface FilterSidebarProps {
+export interface FilterSidebarProps {
   categories: Category[];
   selectedCategories: string[];
   priceRange: [number, number];
@@ -79,14 +79,14 @@ function FilterSidebar({
           <AccordionContent>
             <div className="space-y-3">
               {categories.map((category) => (
-                <div key={category._id} className="flex items-center space-x-2">
+                <div key={category.id} className="flex items-center space-x-2">
                   <Checkbox
-                    id={`category-${category._id}`}
+                    id={`category-${category.id}`}
                     checked={selectedCategories.includes(category.name)}
                     onCheckedChange={() => onCategoryChange(category.name)}
                   />
                   <Label
-                    htmlFor={`category-${category._id}`}
+                    htmlFor={`category-${category.id}`}
                     className="text-sm font-normal cursor-pointer"
                   >
                     {category.name}

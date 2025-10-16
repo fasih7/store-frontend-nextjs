@@ -11,6 +11,7 @@ function BestSellingProducts() {
     async function fetchProducts() {
       try {
         const allProducts = await productGateway.getManyProducts({ limit: 4 });
+        console.log("bestSelling: ", allProducts.data);
         setBestSellingProducts(allProducts.data);
       } catch (error) {
         console.error("Failed to load products", error);

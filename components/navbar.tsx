@@ -92,15 +92,24 @@ export default function Navbar() {
 
         {/* Search & Cart */}
         <div className="flex items-center gap-4 ml-auto px-4 md:px-0">
-          <form onSubmit={handleSearch} className="hidden md:flex items-center">
+          <form
+            onSubmit={handleSearch}
+            className="hidden md:flex items-center"
+            role="search"
+          >
             <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Search
+                className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground"
+                aria-hidden="true"
+              />
               <Input
                 type="search"
                 placeholder="Search products..."
                 className="w-full md:w-[200px] lg:w-[300px] pl-8"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                aria-label="Search products"
+                autoComplete="off"
               />
             </div>
           </form>
@@ -111,6 +120,7 @@ export default function Navbar() {
             size="icon"
             className="md:hidden"
             onClick={() => router.push("/search")}
+            aria-label="Open search page"
           >
             <Search className="w-5 h-5" />
           </Button>

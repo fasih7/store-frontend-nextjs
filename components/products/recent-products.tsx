@@ -11,6 +11,7 @@ function RecentProducts() {
     async function fetchProducts() {
       try {
         const allProducts = await productGateway.getRecentlyAddedProducts();
+        console.log("recent: ", allProducts);
         setRecentProducts(allProducts);
       } catch (error) {
         console.error("Failed to load products", error);

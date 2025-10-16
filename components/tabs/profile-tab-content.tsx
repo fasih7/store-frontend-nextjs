@@ -32,7 +32,12 @@ export default function ProfileTabContent({ user }: Record<string, any>) {
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" defaultValue={user?.email} />
+              <Input
+                id="email"
+                type="email"
+                disabled
+                defaultValue={user?.email}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="phone">Phone</Label>
@@ -42,10 +47,10 @@ export default function ProfileTabContent({ user }: Record<string, any>) {
               <Label htmlFor="birthday">Date of Birth</Label>
               <Input id="birthday" type="date" defaultValue="1990-01-15" />
             </div> */}
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <Label htmlFor="gender">Gender</Label>
               <Input id="gender" defaultValue="Male" />
-            </div>
+            </div> */}
           </div>
           <Button>Save Changes</Button>
         </CardContent>

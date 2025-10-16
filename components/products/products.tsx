@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Button } from "../ui/button";
 import { SlidersHorizontal } from "lucide-react";
 import { categoriesGateway } from "@/domain/gateways/categories.gateway";
+import { ProductsMobileFilter } from "./mobile-filter";
 
 const sortMappings: Record<string, any> = {
   priceLowHigh: { sortBy: "price", order: 1 },
@@ -67,8 +68,9 @@ function Products() {
         // Get selected category ids for query
         const selectedCateoryIds = categories
           .filter((category) => selectedCategories.includes(category.name))
-          .map((category) => category._id)
+          .map((category) => category.id)
           .join(",");
+        console.log({ selectedCateoryIds });
 
         const allProducts = await productGateway.getManyProducts({
           ...sortOption,
@@ -105,33 +107,16 @@ function Products() {
       <div className="container mx-auto px-4 py-4 md:py-6 md:px-8">
         <div className="flex flex-col space-y-4 md:space-y-0 md:flex-row md:gap-6">
           {/* Mobile Filter Button */}
-          <div className="flex md:hidden justify-between items-center mb-4">
-            <h1 className="text-2xl font-bold">Search Products</h1>
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <SlidersHorizontal className="h-4 w-4 mr-2" />
-                  Filters
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-[300px] sm:w-[400px]">
-                <div className="py-4">
-                  <FilterSidebar
-                    categories={categories}
-                    selectedCategories={selectedCategories}
-                    priceRange={priceRange}
-                    minPrice={1}
-                    maxPrice={100000}
-                    sortOption={sortValue}
-                    onSortChange={handleSortChange}
-                    onCategoryChange={handleCategoryChange}
-                    onPriceChange={handlePriceChange}
-                    onClearFilters={clearAllFilters}
-                  />
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
+          <ProductsMobileFilter
+            categories={categories}
+            selectedCategories={selectedCategories}
+            priceRange={priceRange}
+            sortValue={sortValue}
+            handleSortChange={handleSortChange}
+            handleCategoryChange={handleCategoryChange}
+            handlePriceChange={handlePriceChange}
+            clearAllFilters={clearAllFilters}
+          />
           {/* Desktop Sidebar */}
           <div className="hidden md:block w-1/4 min-w-[250px]">
             <FilterSidebar
@@ -157,7 +142,7 @@ function Products() {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {products.map((product) => (
-                    <ProductCard key={product._id} product={product} />
+                    <ProductCard key={product.id} product={product} />
                   ))}
                 </div>
               )}

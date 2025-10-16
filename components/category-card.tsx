@@ -19,11 +19,17 @@ function CategoryCard({ category }: Readonly<CategoryCardProps>) {
     <Link href={`categories/${category.slug}`}>
       <Card className="overflow-hidden transition-all hover:shadow-md py-0 gap-0">
         <div className="aspect-square relative">
-          <Image
+          {/* <Image
             src={category.image || "/placeholder.svg"}
             alt={category.name}
             fill
             className="object-cover"
+          /> */}
+          <img
+            src={category.image || "/placeholder.svg"}
+            alt={category.name || "Product"}
+            // fill
+            className="object-cover transition-transform group-hover:scale-105"
           />
         </div>
         <CardContent className="p-4">

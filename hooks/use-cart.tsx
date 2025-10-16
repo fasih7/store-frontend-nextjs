@@ -10,7 +10,7 @@ import {
 } from "react";
 
 interface CartItem {
-  _id: string;
+  id: string;
   title: string;
   description: string;
   price: number;
@@ -56,10 +56,10 @@ export function CartProvider({ children }: Readonly<{ children: ReactNode }>) {
 
   const addToCart = (cartItem: CartItem) => {
     setItems((prev) => {
-      const existingItem = prev.find((item) => item._id === cartItem._id);
+      const existingItem = prev.find((item) => item.id === cartItem.id);
       if (existingItem) {
         return prev.map((item) =>
-          item._id === cartItem._id
+          item.id === cartItem.id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
@@ -72,7 +72,7 @@ export function CartProvider({ children }: Readonly<{ children: ReactNode }>) {
   const updateQuantity = (id: string, quantity: number) => {
     setItems((prev) =>
       prev
-        .map((item) => (item._id === id ? { ...item, quantity } : item))
+        .map((item) => (item.id === id ? { ...item, quantity } : item))
         .filter((item) => item.quantity > 0)
     );
   };
@@ -80,7 +80,7 @@ export function CartProvider({ children }: Readonly<{ children: ReactNode }>) {
   const removeFromCart = (productId: string) => {
     setItems((items) => {
       // Find the index of the product with the given ID
-      const index = items.findIndex((item) => item._id === productId);
+      const index = items.findIndex((item) => item.id === productId);
 
       // If the product is in the cart, remove it
       if (index !== -1) {
