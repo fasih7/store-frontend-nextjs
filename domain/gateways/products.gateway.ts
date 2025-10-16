@@ -13,6 +13,8 @@ export class ProductGateway extends HttpClient {
       }`);
     options?.category && (queryOptions += `&category=${options.category}`);
 
+    console.log({ queryOptions });
+
     return await this.get(`/products${queryOptions}`);
   }
 

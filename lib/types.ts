@@ -26,6 +26,8 @@ export interface OrderDetails {
   city: string;
   paymentMethod: "cash";
   zip: string;
+  saveAddress?: boolean;
+  addressLabel?: string;
 }
 
 export interface User {
@@ -39,9 +41,9 @@ export interface User {
 export interface SavedAddress {
   id: string;
   label: string; // e.g., "Home", "Office"
-  address: string;
+  addressLine: string;
   city: string;
   province: string;
-  zip: string;
+  postalCode: string; // Changed from zip to match backend schema
   isDefault?: boolean;
 }

@@ -8,9 +8,9 @@ import FilterSidebar from "../filter-sidebar";
 import { getAllCategories } from "@/lib/data";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Button } from "../ui/button";
-import { SlidersHorizontal } from "lucide-react";
+import { Car, SlidersHorizontal } from "lucide-react";
 import { categoriesGateway } from "@/domain/gateways/categories.gateway";
-import { ProductsMobileFilter } from "./mobile-filter";
+import { CardContent2 } from "../cards/card-content-2";
 
 const sortMappings: Record<string, any> = {
   priceLowHigh: { sortBy: "price", order: 1 },
@@ -21,7 +21,7 @@ const sortMappings: Record<string, any> = {
   sort: {},
 };
 
-function Products() {
+function Products2() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -66,15 +66,14 @@ function Products() {
 
       try {
         // Get selected category ids for query
-        const selectedCateoryIds = categories
+        const selectedCategoryIds = categories
           .filter((category) => selectedCategories.includes(category.name))
           .map((category) => category.id)
           .join(",");
-        console.log({ selectedCateoryIds });
 
         const allProducts = await productGateway.getManyProducts({
           ...sortOption,
-          category: selectedCateoryIds,
+          category: selectedCategoryIds,
         });
         setProducts(allProducts.data);
       } catch (error) {
@@ -107,16 +106,33 @@ function Products() {
       <div className="container mx-auto px-4 py-4 md:py-6 md:px-8">
         <div className="flex flex-col space-y-4 md:space-y-0 md:flex-row md:gap-6">
           {/* Mobile Filter Button */}
-          <ProductsMobileFilter
-            categories={categories}
-            selectedCategories={selectedCategories}
-            priceRange={priceRange}
-            sortValue={sortValue}
-            handleSortChange={handleSortChange}
-            handleCategoryChange={handleCategoryChange}
-            handlePriceChange={handlePriceChange}
-            clearAllFilters={clearAllFilters}
-          />
+          <div className="flex md:hidden justify-between items-center mb-4">
+            <h1 className="text-2xl font-bold">Search Products</h1>
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <SlidersHorizontal className="h-4 w-4 mr-2" />
+                  Filters
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[300px] sm:w-[400px] p-2">
+                <div className="py-4">
+                  <FilterSidebar
+                    categories={categories}
+                    selectedCategories={selectedCategories}
+                    priceRange={priceRange}
+                    minPrice={1}
+                    maxPrice={100000}
+                    sortOption={sortValue}
+                    onSortChange={handleSortChange}
+                    onCategoryChange={handleCategoryChange}
+                    onPriceChange={handlePriceChange}
+                    onClearFilters={clearAllFilters}
+                  />
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
           {/* Desktop Sidebar */}
           <div className="hidden md:block w-1/4 min-w-[250px]">
             <FilterSidebar
@@ -135,15 +151,13 @@ function Products() {
 
           <section className="w-full py-12">
             <div className="container mx-auto px-4 py-4 md:py-6 md:px-8">
-              <h1 className="text-3xl font-bold mb-8">All Products</h1>
+              <h1 className="text-3xl font-bold mb-8">All Products 2</h1>
 
               {loading ? (
                 <p>Loading products...</p>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {products.map((product) => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
+                <div className="">
+                  <CardContent2 itemsArray={[...products, ...products]} />
                 </div>
               )}
             </div>
@@ -154,4 +168,4 @@ function Products() {
   );
 }
 
-export default Products;
+export default Products2;

@@ -16,6 +16,11 @@ export class OrdersGateway extends HttpClient {
     return response;
   }
 
+  async getCurrentUserOrders() {
+    const response = await this.get("/me");
+    return response;
+  }
+
   async getAllOrders() {
     const response = await this.get("");
     return response;

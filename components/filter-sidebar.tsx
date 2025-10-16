@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/accordion";
 import { Category } from "@/lib/types";
 
-interface FilterSidebarProps {
+export interface FilterSidebarProps {
   categories: Category[];
   selectedCategories: string[];
   priceRange: [number, number];

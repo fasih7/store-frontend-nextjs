@@ -1,4 +1,11 @@
+"use client";
+
 import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import { newsletterSchema, type NewsletterData } from "@/lib/validations";
+import { Loader2, Mail } from "lucide-react";
 
 /**
  * A component for displaying a newsletter subscription form.
@@ -6,6 +13,55 @@ import { Button } from "./ui/button";
  * @return {JSX.Element}
  */
 function NewsLetter() {
+  const { toast } = useToast();
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setErrors({});
+
+    try {
+      // Validate the email
+      const validatedData = newsletterSchema.parse({ email });
+
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Show success message
+      toast({
+        title: "Successfully subscribed!",
+        description: "Thank you for subscribing to our newsletter.",
+        variant: "success",
+      });
+
+      // Clear the form
+      setEmail("");
+    } catch (error: any) {
+      if (error.errors) {
+        // Zod validation errors
+        const fieldErrors: Record<string, string> = {};
+        error.errors.forEach((err: any) => {
+          if (err.path) {
+            fieldErrors[err.path[0]] = err.message;
+          }
+        });
+        setErrors(fieldErrors);
+      } else {
+        // API errors
+        toast({
+          title: "Subscription failed",
+          description: "Something went wrong. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <section className="w-full py-12 bg-gray-50">
       <div className="container mx-auto px-4 py-4 md:py-6 md:px-8">
@@ -21,16 +77,37 @@ function NewsLetter() {
           </div>
           {/* Newsletter form */}
           <div className="w-full max-w-sm space-y-2">
-            <form className="flex space-x-2">
+            <form className="flex space-x-2" onSubmit={handleSubmit}>
               {/* Email input field */}
-              <input
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                placeholder="Enter your email"
-                type="email"
-                required
-              />
+              <div className="flex-1">
+                <Input
+                  placeholder="Enter your email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (errors.email) {
+                      setErrors((prev) => ({ ...prev, email: "" }));
+                    }
+                  }}
+                  disabled={isLoading}
+                  className={errors.email ? "border-red-500" : ""}
+                />
+                {errors.email && (
+                  <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+                )}
+              </div>
               {/* Subscribe button */}
-              <Button type="submit">Subscribe</Button>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <>
+                    <Mail className="h-4 w-4 mr-2" />
+                    Subscribe
+                  </>
+                )}
+              </Button>
             </form>
           </div>
         </div>

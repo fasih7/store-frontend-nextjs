@@ -57,6 +57,24 @@ export class HttpClient {
     return this.handleResponse(res);
   }
 
+  protected async patch(
+    endpoint: string,
+    body: any,
+    headers: Record<string, string> = {}
+  ) {
+    const res = await fetch(`${this.baseUrl}${endpoint}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        ...this.getAuthHeader(),
+        ...headers,
+      },
+      body: JSON.stringify(body),
+    });
+
+    return this.handleResponse(res);
+  }
+
   protected async delete(
     endpoint: string,
     headers: Record<string, string> = {}
@@ -98,7 +116,23 @@ export class HttpClient {
       throw error;
     }
 
-    return res.json();
+    // Handle empty responses (like 204 No Content or 200 OK with no body)
+    const contentType = res.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      return null;
+    }
+
+    // Check if response has content before trying to parse JSON
+    const text = await res.text();
+    if (!text.trim()) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(text);
+    } catch {
+      return null;
+    }
   }
 
   private getAuthHeader(): Record<string, string> {

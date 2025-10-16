@@ -6,6 +6,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
+import { Switch } from "../ui/switch";
 import {
   Select,
   SelectContent,
@@ -18,6 +19,7 @@ import { useEffect, useState } from "react";
 import { OTPModal } from "../dialogs/opt-modal";
 import { OrderDetails, SavedAddress, User } from "@/lib/types";
 import { ordersGateway } from "@/domain/gateways/orders.gateway";
+import { userGateway } from "@/domain/gateways/user.gateway";
 import { useCart } from "@/hooks/use-cart";
 import { useRouter } from "next/navigation";
 import { AlertDialog, useAlert } from "../shared/alerts";
@@ -50,6 +52,8 @@ export default function CheckoutForm({
     province: "",
     paymentMethod: "cash",
     zip: "",
+    saveAddress: false,
+    addressLabel: "",
   });
 
   // Pre-fill form with user data when component mounts or user changes
@@ -74,10 +78,10 @@ export default function CheckoutForm({
       if (address) {
         setOrderDetails((prev) => ({
           ...prev,
-          address: address.address,
+          address: address.addressLine,
           city: address.city,
           province: address.province,
-          zip: address.zip,
+          zip: address.postalCode,
         }));
         setShowAddNewAddress(false);
       }
@@ -142,6 +146,24 @@ export default function CheckoutForm({
 
     try {
       const orderId = await ordersGateway.submitOrder(submitParams);
+
+      // Save address if user wants to save it and is logged in
+      if (user && orderDetails.saveAddress && orderDetails.addressLabel) {
+        try {
+          await userGateway.saveAddressForCurrentUser({
+            label: orderDetails.addressLabel,
+            addressLine: orderDetails.address,
+            city: orderDetails.city,
+            province: orderDetails.province,
+            postalCode: orderDetails.zip,
+          });
+        } catch (addressError: any) {
+          console.error("Failed to save address", addressError);
+          // Don't block the order success flow if address saving fails
+          // The order was already successful
+        }
+      }
+
       router.push(`/order-success/${orderId}`);
     } catch (error: any) {
       console.error("Order submission failed", error);
@@ -167,6 +189,7 @@ export default function CheckoutForm({
       try {
         const orderId = await ordersGateway.submitOrder(submitParams);
         setIsOtpOpen(false);
+        // Note: Guest users cannot save addresses since they're not logged in
         router.push(`/order-success/${orderId}`);
       } catch (error: any) {
         console.error("Order submission failed", error);
@@ -287,37 +310,58 @@ export default function CheckoutForm({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Select
-                  value={selectedSavedAddress}
-                  onValueChange={setSelectedSavedAddress}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a saved address" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {savedAddresses.map((address) => (
-                      <SelectItem key={address.id} value={address.id}>
-                        <div className="text-left">
-                          <p className="font-medium">{address.label}</p>
-                          <p className="text-sm text-gray-500">
-                            {address.address}, {address.city},{" "}
-                            {address.province}
-                          </p>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleAddNewAddress}
-                  className="mt-3 w-full"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add New Address
-                </Button>
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <Select
+                      value={selectedSavedAddress}
+                      onValueChange={setSelectedSavedAddress}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a saved address" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {savedAddresses.map((address) => (
+                          <SelectItem key={address.id} value={address.id}>
+                            <div className="text-left">
+                              <p className="font-medium">{address.label}</p>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex-1 flex">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleAddNewAddress}
+                      className="w-full h-auto self-stretch"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add New Address
+                    </Button>
+                  </div>
+                </div>
+                {selectedSavedAddress && (
+                  <div className="mt-4 p-3 bg-gray-50 border rounded text-sm text-gray-700">
+                    {(() => {
+                      const address = savedAddresses.find(
+                        (addr) => addr.id === selectedSavedAddress
+                      );
+                      if (!address) return null;
+                      return (
+                        <>
+                          <div className="font-semibold">{address.label}</div>
+                          <div>{address.addressLine}</div>
+                          <div>
+                            {address.city}, {address.province}{" "}
+                            {address.postalCode}
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}
@@ -391,6 +435,53 @@ export default function CheckoutForm({
               </div>
             </>
           )}
+
+          {/* Save Address Toggle - Only for logged-in users */}
+          {user &&
+            savedAddresses.length < 5 &&
+            (!savedAddresses.length ||
+              showAddNewAddress ||
+              !selectedSavedAddress) && (
+              <div className="space-y-4 p-4 border rounded-lg bg-gray-50">
+                <div className="flex items-center space-x-3">
+                  <Switch
+                    id="saveAddress"
+                    checked={orderDetails.saveAddress || false}
+                    onCheckedChange={(checked: boolean) =>
+                      setOrderDetails({
+                        ...orderDetails,
+                        saveAddress: checked,
+                        addressLabel: checked ? orderDetails.addressLabel : "",
+                      })
+                    }
+                  />
+                  <Label htmlFor="saveAddress" className="text-sm font-medium">
+                    Save this address for future orders
+                  </Label>
+                </div>
+
+                {orderDetails.saveAddress && (
+                  <div>
+                    <Label htmlFor="addressLabel">Address Label</Label>
+                    <Input
+                      id="addressLabel"
+                      value={orderDetails.addressLabel || ""}
+                      onChange={(e) =>
+                        setOrderDetails({
+                          ...orderDetails,
+                          addressLabel: e.target.value,
+                        })
+                      }
+                      placeholder="e.g., Home, Office, Work"
+                      className="mt-1"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Give this address a name to easily identify it later
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
 
           {/* Payment Method */}
           <div>
