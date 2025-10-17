@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,8 @@ import { authGateway } from "@/domain/gateways/auth.gateway";
 import TwitterIcon from "@/components/icons/TwitterIcon";
 import GoogleIcon from "@/components/icons/GoogleIcon";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { OTPModal } from "@/components/dialogs/opt-modal";
 
 // Reusable IconInput component
 function IconInput({
@@ -62,29 +64,148 @@ function IconInput({
 
 export default function AuthPage() {
   const router = useRouter();
+  const { toast } = useToast();
 
   // States
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showSignupPassword, setShowSignupPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
+  const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
+  const [otpError, setOtpError] = useState("");
+  const [resendTimer, setResendTimer] = useState(0);
   const { setIsLoggedIn } = useAuth();
 
+  // Timer effect for resend functionality
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [resendTimer]);
+
   // Signup Handler
-  const handleSignup = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
 
-    if (formData.get("password") !== formData.get("confirmPassword")) {
-      return alert("Passwords do not match");
+    const firstName = formData.get("firstName") as string;
+    const lastName = formData.get("lastName") as string;
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
+
+    if (password !== confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Passwords do not match",
+        variant: "destructive",
+      });
+      return;
     }
 
-    console.log("Signup:", {
-      name: formData.get("name"),
-      email: formData.get("email"),
-      password: formData.get("password"),
-      confirmPassword: formData.get("confirmPassword"),
-    });
+    setIsSubmitting(true);
+    try {
+      const response = await authGateway.signUp(
+        firstName,
+        lastName,
+        email,
+        password
+      );
+
+      if (response.success) {
+        setUserEmail(email);
+        setIsOtpModalOpen(true);
+        setResendTimer(60);
+        toast({
+          title: "Success",
+          description:
+            "Account created! Please check your email for verification code.",
+          variant: "success",
+        });
+      }
+    } catch (error: any) {
+      console.error("Signup error:", error);
+
+      if (error.message === "Email is pending verification") {
+        toast({
+          title: "Email Pending Verification",
+          description:
+            "Please check your email for the verification code or resend it.",
+          variant: "destructive",
+        });
+        setUserEmail(email);
+        setIsOtpModalOpen(true);
+        setResendTimer(60);
+      } else if (error.message === "User with this email already exists") {
+        toast({
+          title: "Account Exists",
+          description:
+            "An account with this email already exists. Please try logging in.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Signup Failed",
+          description: error.message || "An error occurred during signup",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Verification Handler
+  const handleVerifyEmail = async (token: string) => {
+    try {
+      await authGateway.verifyEmail(userEmail, token);
+      setIsLoggedIn(true);
+      setIsOtpModalOpen(false);
+      toast({
+        title: "Success",
+        description: "Email verified successfully! Welcome!",
+        variant: "success",
+      });
+      router.push("/");
+    } catch (error: any) {
+      console.error("Verification error:", error);
+
+      if (error.message === "Not found") {
+        setOtpError("Invalid verification code. Please try again.");
+      } else if (error.message.includes("Incorrect token")) {
+        setOtpError(error.message);
+      } else if (error.message === "Token has been expired") {
+        setOtpError("Verification code has expired. Please request a new one.");
+      } else {
+        setOtpError(error.message || "Verification failed. Please try again.");
+      }
+    }
+  };
+
+  // Resend Token Handler
+  const handleResendToken = async () => {
+    try {
+      await authGateway.resendToken(userEmail);
+      setResendTimer(60);
+      setOtpError("");
+      toast({
+        title: "Code Sent",
+        description: "A new verification code has been sent to your email.",
+        variant: "success",
+      });
+    } catch (error: any) {
+      console.error("Resend error:", error);
+      toast({
+        title: "Resend Failed",
+        description: error.message || "Failed to resend verification code",
+        variant: "destructive",
+      });
+    }
   };
 
   // Login Handler
@@ -101,8 +222,12 @@ export default function AuthPage() {
 
       setIsLoggedIn(true);
       router.push("/");
-    } catch (error) {
-      alert(`Login failed: ${error}`);
+    } catch (error: any) {
+      toast({
+        title: "Login Failed",
+        description: error.message || "An error occurred during login",
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -190,10 +315,19 @@ export default function AuthPage() {
               <form onSubmit={handleSignup} className="space-y-4">
                 <IconInput
                   icon={User}
-                  id="signup-name"
-                  name="name"
+                  id="signup-firstname"
+                  name="firstName"
                   type="text"
-                  placeholder="Full Name"
+                  placeholder="First Name"
+                  required
+                />
+
+                <IconInput
+                  icon={User}
+                  id="signup-lastname"
+                  name="lastName"
+                  type="text"
+                  placeholder="Last Name"
                   required
                 />
 
@@ -268,8 +402,12 @@ export default function AuthPage() {
                   </div>
                 </div>
 
-                <Button type="submit" className="w-full">
-                  Create Account
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Creating Account..." : "Create Account"}
                 </Button>
 
                 <p className="text-xs text-center text-muted-foreground">
@@ -312,6 +450,16 @@ export default function AuthPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* OTP Verification Modal */}
+      <OTPModal
+        open={isOtpModalOpen}
+        onOpenChange={setIsOtpModalOpen}
+        onOptSubmit={handleVerifyEmail}
+        onResendOTP={handleResendToken}
+        timer={resendTimer}
+        errorMessage={otpError}
+      />
     </div>
   );
 }
