@@ -22,6 +22,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { buildImageUrl } from "@/lib/utils";
 
 interface Params {
   id: string;
@@ -131,7 +132,7 @@ export default function SingleProductPage({
               {/* Main Image */}
               <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-gray-50 shadow-sm">
                 <Image
-                  src={product?.primaryImage || "/placeholder/400x400.svg"}
+                  src={buildImageUrl(product?.primaryImage)}
                   alt={product?.title || "Product"}
                   fill
                   className="object-cover transition-transform duration-300 hover:scale-105"
@@ -153,7 +154,7 @@ export default function SingleProductPage({
                       }`}
                     >
                       <Image
-                        src={image}
+                        src={buildImageUrl(image)}
                         alt={`${product.title} ${index + 1}`}
                         fill
                         className="object-cover"

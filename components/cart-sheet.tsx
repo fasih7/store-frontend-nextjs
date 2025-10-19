@@ -13,6 +13,7 @@ import Image from "next/image";
 import { Separator } from "./ui/separator";
 import { useCart } from "@/hooks/use-cart";
 import { useCartSheet } from "@/hooks/use-cart-sheet";
+import { buildImageUrl } from "@/lib/utils";
 export default function CartSheet() {
   const { items, removeFromCart, updateQuantity, clearCart } = useCart();
   const { open, setOpen } = useCartSheet();
@@ -68,7 +69,7 @@ export default function CartSheet() {
                     <div className="relative h-16 w-16 overflow-hidden rounded">
                       {/* <Image todo: will update with local images*/}
                       <img
-                        src={item.primaryImage}
+                        src={buildImageUrl(item.primaryImage)}
                         alt={item.title}
                         // fill
                         className="object-cover"

@@ -16,14 +16,14 @@ export default function ProfileTabs() {
         <MapPin className="w-4 h-4" />
         Addresses
       </TabsTrigger>
-      <TabsTrigger value="payment" className="flex items-center gap-2">
+      {/* <TabsTrigger value="payment" className="flex items-center gap-2"> //todo: add payment tab    
         <CreditCard className="w-4 h-4" />
         Payment
-      </TabsTrigger>
-      <TabsTrigger value="wishlist" className="flex items-center gap-2">
+      </TabsTrigger> */}
+      {/* <TabsTrigger value="wishlist" className="flex items-center gap-2"> //todo: add wishlist tab
         <Heart className="w-4 h-4" />
         Wishlist
-      </TabsTrigger>
+      </TabsTrigger> */}
     </TabsList>
   );
 }

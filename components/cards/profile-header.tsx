@@ -31,15 +31,15 @@ export default function ProfileHeader({ user, totalOrders }: any) {
               <h1 className="text-2xl font-bold">
                 {user?.firstName + " " + user?.lastName}
               </h1>
-              <Badge variant="secondary" className="w-fit">
+              {/* <Badge variant="secondary" className="w-fit"> //todo: check if we need this
                 Premium Member
-              </Badge>
+              </Badge> */}
             </div>
             <p className="text-muted-foreground">{user?.email}</p>
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
-                {getReadableDate(new Date(user?.createdAt))}
+                Member since: {getReadableDate(new Date(user?.createdAt))}
               </div>
               <div className="flex items-center gap-1">
                 <Package className="w-4 h-4" />

@@ -8,6 +8,7 @@ import AddToCartButton from "@/components/add-to-cart-button";
 import { Product } from "@/lib/types";
 import React, { useState, useEffect } from "react";
 import { productGateway } from "@/domain/gateways/products.gateway";
+import { buildImageUrl } from "@/lib/utils";
 
 interface Params {
   id: string;
@@ -60,7 +61,7 @@ export default function SingleProductPage({
             <div className="relative aspect-square w-full">
               {/* <Image todo: add the product image  */}
               <img
-                src={product?.primaryImage || "/placeholder/400x400.svg"}
+                src={buildImageUrl(product?.primaryImage)}
                 alt={product?.title || "Product"}
                 // layout="fill"
                 className="object-cover rounded-lg shadow-lg"
