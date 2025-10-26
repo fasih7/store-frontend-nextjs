@@ -33,12 +33,14 @@ export default function CheckoutForm({
   user,
   savedAddresses = [],
 }: CheckoutFormProps) {
-  const { items } = useCart();
+  const { items, clearCart } = useCart();
   const [timer, setTimer] = useState(30);
   const [errorMessage, setErrorMessage] = useState<string | undefined>();
   const { alert, hideAlert, showError } = useAlert();
   const [selectedSavedAddress, setSelectedSavedAddress] = useState<string>("");
   const [showAddNewAddress, setShowAddNewAddress] = useState(false);
+  const [lastOtpSentTime, setLastOtpSentTime] = useState<number | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const router = useRouter();
   const [isOtpOpen, setIsOtpOpen] = useState(false);
@@ -88,16 +90,24 @@ export default function CheckoutForm({
     }
   }, [selectedSavedAddress, savedAddresses]);
 
-  // Timer countdown effect
+  // Timer countdown effect - calculate remaining time from last OTP sent
   useEffect(() => {
-    if (timer <= 0) return;
+    if (!lastOtpSentTime) return;
 
-    const interval = setInterval(() => {
-      setTimer((prev) => prev - 1);
-    }, 1000);
+    const updateTimer = () => {
+      const elapsed = Math.floor((Date.now() - lastOtpSentTime) / 1000);
+      const remaining = Math.max(0, 30 - elapsed);
+      setTimer(remaining);
+    };
+
+    // Update immediately
+    updateTimer();
+
+    // Update every second
+    const interval = setInterval(updateTimer, 1000);
 
     return () => clearInterval(interval);
-  }, [timer]);
+  }, [lastOtpSentTime]);
 
   const sendOtpForVerification = async () => {
     try {
@@ -105,7 +115,8 @@ export default function CheckoutForm({
         orderDetails.email,
         orderDetails.firstName
       );
-      setTimer(30);
+      setLastOtpSentTime(Date.now());
+
       return true;
     } catch (error: any) {
       console.error("Email verification failed", error);
@@ -117,14 +128,29 @@ export default function CheckoutForm({
   const handleProceed = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Prevent checkout if cart is empty
+    if (items.length === 0) {
+      showError(
+        "Error!",
+        "Your cart is empty. Please add items before proceeding."
+      );
+      return;
+    }
+
     // For logged-in users, skip OTP verification
     if (user) {
       await handleDirectSubmit();
     } else {
       // For guest users, require OTP verification
-      const result = await sendOtpForVerification();
-      if (result) {
+      // If timer is still active, just open the modal without calling API
+      if (timer > 0 && lastOtpSentTime) {
         setIsOtpOpen(true);
+      } else {
+        // Timer expired or first time, call API
+        const result = await sendOtpForVerification();
+        if (result) {
+          setIsOtpOpen(true);
+        }
       }
     }
   };
@@ -143,6 +169,8 @@ export default function CheckoutForm({
         0
       ),
     };
+
+    setIsSubmitting(true);
 
     try {
       const orderId = await ordersGateway.submitOrder(submitParams);
@@ -164,21 +192,40 @@ export default function CheckoutForm({
         }
       }
 
+      // Redirect to order success page
       router.push(`/order-success/${orderId}`);
+
+      // Clear cart after redirect starts (slight delay to ensure navigation has started)
+      setTimeout(() => {
+        clearCart();
+      }, 100);
     } catch (error: any) {
       console.error("Order submission failed", error);
+      setIsSubmitting(false);
       showError("Error!", error.message || "Something went wrong!");
     }
   };
 
   const handleOtpSubmit = async (otpValue: string) => {
     if (otpValue) {
+      // Clear any previous error before submitting
+      setErrorMessage(undefined);
+
+      // Prevent checkout if cart is empty
+      if (items.length === 0) {
+        setErrorMessage(
+          "Your cart is empty. Please add items before proceeding."
+        );
+        return;
+      }
+
       const submitParams = {
         ...orderDetails,
         token: otpValue,
         items: items.map((item) => ({
           productId: item.id,
           quantity: item.quantity,
+          price: +item.price,
         })),
         totalPrice: items.reduce(
           (sum, item) => sum + +item.price * (item.quantity ?? 1),
@@ -186,20 +233,53 @@ export default function CheckoutForm({
         ),
       };
 
+      setIsSubmitting(true);
+
       try {
         const orderId = await ordersGateway.submitOrder(submitParams);
+        // Clear error on successful submission
+        setErrorMessage(undefined);
         setIsOtpOpen(false);
-        // Note: Guest users cannot save addresses since they're not logged in
-        router.push(`/order-success/${orderId}`);
+
+        // Guest user - store order data and redirect to guest order success page
+        const guestOrderData = {
+          orderId,
+          createdAt: new Date().toISOString(),
+          totalPrice: submitParams.totalPrice,
+          paymentMethod: submitParams.paymentMethod,
+          items: submitParams.items,
+          firstName: submitParams.firstName,
+          lastName: submitParams.lastName,
+          address: submitParams.address,
+          city: submitParams.city,
+          province: submitParams.province,
+          email: submitParams.email,
+        };
+
+        // Store order data in sessionStorage for one-time access
+        sessionStorage.setItem(
+          "guestOrderData",
+          JSON.stringify(guestOrderData)
+        );
+
+        router.push("/guest-order-success");
+
+        // Clear cart after redirect starts (slight delay to ensure navigation has started)
+        setTimeout(() => {
+          clearCart();
+        }, 100);
       } catch (error: any) {
         console.error("Order submission failed", error);
-        setErrorMessage(error.message || "Something went wrong!");
+        const errorMsg = error.message || "Something went wrong!";
+        setIsSubmitting(false);
+        setErrorMessage(errorMsg);
       }
     }
   };
 
   const handleOtpModalChange = (open: boolean) => {
     setIsOtpOpen(open);
+    // Clear error when modal is closed
     if (!open) {
       setErrorMessage(undefined);
     }
@@ -219,7 +299,18 @@ export default function CheckoutForm({
   };
 
   return (
-    <div className="col-span-2">
+    <div className="col-span-2 relative">
+      {isSubmitting && (
+        <div className="absolute inset-0 flex items-center justify-center z-50 rounded-lg">
+          <div className="bg-white p-6 rounded-lg flex flex-col items-center gap-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            <p className="text-lg font-medium">Processing your order...</p>
+            <p className="text-sm text-gray-600">
+              Please wait, this may take a moment.
+            </p>
+          </div>
+        </div>
+      )}
       <h1 className="text-3xl font-bold mb-6">Checkout</h1>
 
       {user && (
@@ -296,7 +387,7 @@ export default function CheckoutForm({
               }
               id="phone"
               type="tel"
-              placeholder="03XXXXXXXXX"
+              placeholder="+923XXXXXXXXX"
             />
           </div>
 
@@ -509,8 +600,12 @@ export default function CheckoutForm({
           </div>
 
           <div>
-            <Button type="submit" className="w-full">
-              {user ? "Place Order" : "Verify Email & Place Order"}
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting
+                ? "Processing..."
+                : user
+                ? "Place Order"
+                : "Verify Email & Place Order"}
             </Button>
           </div>
         </form>
@@ -522,8 +617,9 @@ export default function CheckoutForm({
           open={isOtpOpen}
           onOpenChange={handleOtpModalChange}
           onOptSubmit={handleOtpSubmit}
-          onResendOTP={() => {
-            sendOtpForVerification();
+          onResendOTP={async () => {
+            setErrorMessage(undefined); // Clear any existing errors when resending
+            await sendOtpForVerification();
           }}
           timer={timer}
           errorMessage={errorMessage}

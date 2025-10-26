@@ -21,6 +21,7 @@ import GoogleIcon from "@/components/icons/GoogleIcon";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { OTPModal } from "@/components/dialogs/opt-modal";
+import { ForgotPasswordModal } from "@/components/dialogs/forgot-password-modal";
 
 // Reusable IconInput component
 function IconInput({
@@ -73,6 +74,8 @@ export default function AuthPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
+  const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] =
+    useState(false);
   const [otpError, setOtpError] = useState("");
   const [resendTimer, setResendTimer] = useState(0);
   const { setIsLoggedIn } = useAuth();
@@ -300,12 +303,13 @@ export default function AuthPage() {
                 </Button>
 
                 <div className="text-center">
-                  <Link
-                    href="/forgot-password"
-                    className="text-sm text-muted-foreground"
+                  <button
+                    type="button"
+                    onClick={() => setIsForgotPasswordModalOpen(true)}
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     Forgot your password?
-                  </Link>
+                  </button>
                 </div>
               </form>
             </TabsContent>
@@ -459,6 +463,12 @@ export default function AuthPage() {
         onResendOTP={handleResendToken}
         timer={resendTimer}
         errorMessage={otpError}
+      />
+
+      {/* Forgot Password Modal */}
+      <ForgotPasswordModal
+        open={isForgotPasswordModalOpen}
+        onOpenChange={setIsForgotPasswordModalOpen}
       />
     </div>
   );

@@ -34,6 +34,27 @@ export class AuthGateway extends HttpClient {
     return response;
   }
 
+  async refreshToken() {
+    // Use HttpClient's post method to benefit from retry logic
+    const response = await this.post("/refresh-token", {});
+    return response;
+  }
+
+  async logout() {
+    // Clear cookies
+    Cookies.remove("access_token");
+
+    // Clear cart from localStorage
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("cart");
+    }
+
+    // Redirect to login page
+    if (typeof window !== "undefined") {
+      window.location.href = "/auth";
+    }
+  }
+
   async resendToken(email: string) {
     const formData = new URLSearchParams();
     formData.append("email", email);
@@ -75,6 +96,20 @@ export class AuthGateway extends HttpClient {
     }
 
     return { success: true };
+  }
+
+  async forgotPassword(email: string) {
+    const response = await this.post("/forgot-password", { email });
+    return response;
+  }
+
+  async updatePassword(email: string, password: string, token: string) {
+    const response = await this.post("/update-password", {
+      email,
+      password,
+      token,
+    });
+    return response;
   }
 }
 

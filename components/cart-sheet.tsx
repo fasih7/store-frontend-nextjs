@@ -56,7 +56,7 @@ export default function CartSheet() {
                 Add some products to your cart to see them here.
               </p>
             </div>
-            <Button asChild>
+            <Button asChild onClick={() => setOpen(false)}>
               <Link href="/products">Continue Shopping</Link>
             </Button>
           </div>
