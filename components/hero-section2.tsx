@@ -40,14 +40,14 @@ export default function HeroSection2() {
 
             <div className="flex flex-col gap-3 min-[400px]:flex-row justify-center">
               <Link
-                href="/shop"
+                href="/products"
                 className="inline-flex h-12 items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
               >
                 <ShoppingBag className="w-4 h-4 mr-2" />
                 Shop Now
               </Link>
               <Link
-                href="/collections"
+                href="/categories"
                 className="inline-flex h-12 items-center justify-center rounded-md border border-input bg-background px-8 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
               >
                 View Collections

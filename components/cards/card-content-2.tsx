@@ -2,6 +2,7 @@ import { Heart, Star } from "lucide-react";
 import { Button } from "../ui/button";
 import { CardContent, Card } from "../ui/card";
 import { Product } from "../../lib/types";
+import { buildImageUrl } from "../../lib/utils";
 
 export type CardItem = Product;
 
@@ -16,7 +17,7 @@ export function CardContent2({ itemsArray }: { itemsArray: CardItem[] }) {
           >
             <div className="aspect-square bg-gray-100 relative overflow-hidden">
               <img
-                src={item.primaryImage || "/placeholder.svg"}
+                src={buildImageUrl(item.primaryImage)}
                 alt={item.title}
                 className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                 loading="lazy"

@@ -81,7 +81,7 @@ export default function OrdersTab({
             </div>
           ))}
         </CardContent>
-        <CardContent className="space-y-4">
+        {/* <CardContent className="space-y-4">
           {[
             {
               id: "#ORD-2024-001",
@@ -132,7 +132,7 @@ export default function OrdersTab({
               <p className="text-sm text-muted-foreground">{order.items}</p>
             </div>
           ))}
-        </CardContent>
+        </CardContent> */}
       </Card>
     </TabsContent>
   );

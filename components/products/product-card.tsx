@@ -8,6 +8,7 @@ import { useCart } from "@/hooks/use-cart";
 import { Product } from "@/lib/types";
 import { ShoppingCart } from "lucide-react";
 import { useCartSheet } from "@/hooks/use-cart-sheet";
+import { buildImageUrl } from "@/lib/utils";
 
 interface ProductCardProps {
   product: Product;
@@ -24,7 +25,7 @@ function ProductCard({ product }: Readonly<ProductCardProps>) {
         <div className="aspect-square relative overflow-hidden bg-gray-100 group-hover:opacity-75">
           {/* <Image will change back to it with local images */}
           <img
-            src={product.primaryImage || "/placeholder.svg"}
+            src={buildImageUrl(product.primaryImage)}
             alt={product.title || "Product"}
             // fill
             className="object-cover transition-transform group-hover:scale-105"
@@ -37,7 +38,7 @@ function ProductCard({ product }: Readonly<ProductCardProps>) {
           <h3 className="font-medium mt-2 text-lg">{product.title}</h3>
         </Link>
         {/* <p className="text-sm text-gray-500 mt-1">{product.category}</p> */}
-        <p className="font-medium text-lg mt-2">${product.price}</p>
+        <p className="font-medium text-lg mt-2">Rs.{product.price}</p>
       </CardContent>
       <CardFooter className="p-4">
         <Button

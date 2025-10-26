@@ -50,8 +50,11 @@ export function InputOTPForm({
         type: "manual",
         message: errorMessage,
       });
+    } else {
+      // Clear the error when errorMessage is undefined/empty
+      form.clearErrors("pin");
     }
-  }, [errorMessage]);
+  }, [errorMessage, form]);
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     onSuccess(data.pin);
@@ -90,6 +93,7 @@ export function InputOTPForm({
             Submit
           </Button>
           <Button
+            type="button"
             onClick={onResendOTP}
             disabled={timer > 0}
             variant="outline"
