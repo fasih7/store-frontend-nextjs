@@ -21,33 +21,38 @@ function ProductCard({ product }: Readonly<ProductCardProps>) {
   const [imageLoaded, setImageLoaded] = useState(false);
 
   return (
-    <Card className="group overflow-hidden border hover:shadow-xl transition-all duration-500 hover:border-primary/20 h-full flex flex-col bg-background">
+    <Card className="group overflow-hidden border hover:shadow-2xl transition-all duration-500 hover:border-primary/30 h-full flex flex-col glass-card backdrop-blur-xl animate-float-up">
       {/* Image Container with Overlay */}
       <Link href={`/products/${product.id}`} className="relative block">
-        <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-          {/* Background Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="aspect-square relative overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-t-lg">
+          {/* Glowing Background Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+
+          {/* Animated Gradient Border */}
+          <div className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+          </div>
 
           {/* Image */}
           <img
             src={buildImageUrl(product.primaryImage)}
             alt={product.title || "Product"}
-            className={`object-cover transition-all duration-700 group-hover:scale-110 ${
+            className={`w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110 ${
               imageLoaded ? "opacity-100" : "opacity-0"
             }`}
             onLoad={() => setImageLoaded(true)}
           />
 
-          {/* Loading Placeholder */}
-          {!imageLoaded && (
-            <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 animate-pulse" />
-          )}
+          {/* Loading Placeholder with Shimmer */}
+          {!imageLoaded && <div className="absolute inset-0 skeleton-loader" />}
 
-          {/* Wishlist Button */}
-          {/* <Button
+          {/* Wishlist Button with Glass Effect */}
+          <Button
             variant="ghost"
             size="icon"
-            className="absolute top-3 right-3 rounded-full h-9 w-9 bg-white/90 backdrop-blur-sm hover:bg-white shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110"
+            className="absolute top-3 right-3 rounded-full h-10 w-10 glass-button backdrop-blur-md 
+                     shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 
+                     hover:scale-110 hover:shadow-xl z-10"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -55,51 +60,58 @@ function ProductCard({ product }: Readonly<ProductCardProps>) {
             }}
           >
             <Heart
-              className={`h-4 w-4 transition-all duration-300 ${
+              className={`h-5 w-5 transition-all duration-300 glow-on-hover ${
                 isWishlisted
                   ? "fill-red-500 text-red-500 scale-110"
                   : "text-gray-600 hover:text-red-500"
               }`}
             />
-          </Button> */}
+          </Button>
 
-          {/* Category Badge */}
-          {/* <div className="absolute bottom-3 left-3">
-            <span className="px-3 py-1.5 text-xs font-medium bg-white/95 backdrop-blur-sm rounded-full shadow-sm text-gray-700 border border-gray-200">
-              {product.category?.name}
-            </span>
-          </div> */}
+          {/* Category Badge with Glass Effect */}
+          {product.category?.name && (
+            <div className="absolute bottom-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <span
+                className="px-3 py-1.5 text-xs font-semibold glass-button backdrop-blur-md 
+                             rounded-full shadow-lg text-gray-700 dark:text-gray-200"
+              >
+                {product.category.name}
+              </span>
+            </div>
+          )}
         </div>
       </Link>
 
       {/* Content Section */}
-      <CardContent className="p-5 flex-1 flex flex-col gap-3">
+      <CardContent className="p-6 flex-1 flex flex-col gap-4">
         {/* Product Title */}
         <Link href={`/products/${product.id}`}>
-          <h3 className="font-semibold text-base line-clamp-2 hover:text-primary transition-colors duration-200 text-gray-900 dark:text-gray-100 leading-tight">
+          <h3 className="font-bold text-lg line-clamp-2 hover:text-primary transition-all duration-300 text-gray-900 dark:text-gray-100 leading-tight hover:translate-x-1">
             {product.title}
           </h3>
         </Link>
 
         {/* Price */}
-        <div className="flex items-baseline gap-2">
-          <span className="text-2xl font-bold text-primary">
+        <div className="flex items-baseline gap-3">
+          <span className="text-3xl font-extrabold gradient-text-primary">
             Rs. {product.price}
           </span>
         </div>
       </CardContent>
 
       {/* Footer with Action Button */}
-      <CardFooter className="p-5 pt-0">
+      <CardFooter className="p-6 pt-0">
         <Button
           onClick={() => {
             addToCart(product);
             setOpen(true);
           }}
-          className="w-full h-11 font-medium text-sm bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+          className="w-full h-12 font-semibold text-sm gradient-bg-primary text-primary-foreground 
+                   shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] 
+                   active:scale-[0.98] glow-primary hover:glow-primary group"
           size="lg"
         >
-          <ShoppingCart className="mr-2 h-4 w-4" />
+          <ShoppingCart className="mr-2 h-4 w-4 group-hover:rotate-12 transition-transform duration-300" />
           Add to Cart
         </Button>
       </CardFooter>
