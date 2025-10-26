@@ -7,11 +7,14 @@ export class OrdersGateway extends HttpClient {
   }
 
   async submitOrder(params: OrderDetails) {
-    const response = await this.post("", params);
+    const { saveAddress, addressLabel, userId, ...paramsWithoutAddress } =
+      params as any; //Todo: update the type to include userId
+    const response = await this.post("", paramsWithoutAddress);
     return response.id;
   }
 
   async getOrderById(id: string) {
+    console.log("id: ", id);
     const response = await this.get(`/${id}`);
     return response;
   }

@@ -2,11 +2,23 @@ export interface Product {
   id: string;
   title: string;
   description: string;
-  price: number;
+  price: string;
   images?: string[];
   primaryImage: string;
-  category: string;
+  categoryId: string;
+  userId: string;
   quantity: number;
+  createdAt: string;
+  updatedAt: string;
+  category: {
+    id: string;
+    name: string;
+    image: string;
+    slug: string;
+    parentCategoryId: string | null;
+    createdAt: string;
+    updatedAt: string;
+  };
 }
 
 export interface Category {

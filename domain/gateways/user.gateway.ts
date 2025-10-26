@@ -31,6 +31,16 @@ export class UserGateway extends HttpClient {
     const response = await this.delete(`/address/${addressId}`);
     return response;
   }
+
+  async updateUser(userData: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    phone?: string;
+  }) {
+    const response = await this.patch("/update", userData);
+    return response;
+  }
 }
 
 export const userGateway = new UserGateway();

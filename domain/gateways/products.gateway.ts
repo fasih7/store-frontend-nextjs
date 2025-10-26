@@ -12,6 +12,10 @@ export class ProductGateway extends HttpClient {
         options.order || 1
       }`);
     options?.category && (queryOptions += `&category=${options.category}`);
+    options?.searchQuery &&
+      (queryOptions += `&searchQuery=${encodeURIComponent(
+        options.searchQuery
+      )}`);
 
     console.log({ queryOptions });
 
@@ -28,6 +32,12 @@ export class ProductGateway extends HttpClient {
 
   async getRecentlyAddedProducts() {
     return this.get("/products/recently-added");
+  }
+
+  async searchProducts(searchQuery: string) {
+    return this.get(
+      `/products/search?searchQuery=${encodeURIComponent(searchQuery)}`
+    );
   }
 }
 

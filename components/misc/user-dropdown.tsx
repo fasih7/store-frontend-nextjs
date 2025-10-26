@@ -6,12 +6,14 @@ import { User, ChevronDown } from "lucide-react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/hooks/use-cart";
 
 export default function UserMenu() {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { setIsLoggedIn } = useAuth();
+  const { clearCart } = useCart();
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -62,6 +64,8 @@ export default function UserMenu() {
           </Link> */}
           <button
             onClick={() => {
+              // Clear cart on logout
+              clearCart();
               Cookies.remove("access_token");
               setIsLoggedIn(false);
               router.push("/");

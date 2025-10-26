@@ -14,7 +14,7 @@ interface CartItem {
   title: string;
   description: string;
   price: number;
-  images: string[];
+  images?: string[];
   primaryImage: string;
   category: string;
   quantity: number;

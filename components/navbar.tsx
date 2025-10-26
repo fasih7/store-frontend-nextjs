@@ -5,11 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Menu, Search, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import CartSheet from "./cart-sheet";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "./ui/sheet";
 import UserMenu from "./misc/user-dropdown";
 import { useAuth } from "@/contexts/AuthContext";
+import SearchDropdown from "./search/search-dropdown";
 
 /**
  * @description The main navigation component.
@@ -19,6 +20,8 @@ import { useAuth } from "@/contexts/AuthContext";
 export default function Navbar() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchDropdownOpen, setIsSearchDropdownOpen] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
   const { isLoggedIn } = useAuth();
 
   /**
@@ -28,11 +31,51 @@ export default function Navbar() {
    */
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery) {
-      // Redirect to search results page with query parameter.
-      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+    if (searchQuery.trim()) {
+      // Redirect to products page with query parameter.
+      router.push(`/products?q=${encodeURIComponent(searchQuery)}`);
+      setIsSearchDropdownOpen(false);
     }
   };
+
+  /**
+   * Handle search input change.
+   *
+   * @param {React.ChangeEvent<HTMLInputElement>} e - Event object.
+   */
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    setIsSearchDropdownOpen(value.trim().length > 0);
+  };
+
+  /**
+   * Handle navigation to products page with search query.
+   *
+   * @param {string} query - Search query.
+   */
+  const handleNavigateToProducts = (query: string) => {
+    router.push(`/products?q=${encodeURIComponent(query)}`);
+  };
+
+  /**
+   * Close search dropdown when clicking outside.
+   */
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
+        setIsSearchDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const routes = [
     { href: "/", label: "Home" },
@@ -92,35 +135,39 @@ export default function Navbar() {
 
         {/* Search & Cart */}
         <div className="flex items-center gap-4 ml-auto px-4 md:px-0">
-          <form
-            onSubmit={handleSearch}
-            className="hidden md:flex items-center"
-            role="search"
-          >
-            <div className="relative">
-              <Search
-                className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground"
-                aria-hidden="true"
-              />
-              <Input
-                type="search"
-                placeholder="Search products..."
-                className="w-full md:w-[200px] lg:w-[300px] pl-8"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                aria-label="Search products"
-                autoComplete="off"
-              />
-            </div>
-          </form>
+          <div className="hidden md:flex items-center relative" ref={searchRef}>
+            <form onSubmit={handleSearch} role="search">
+              <div className="relative">
+                <Search
+                  className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground"
+                  aria-hidden="true"
+                />
+                <Input
+                  type="search"
+                  placeholder="Search products..."
+                  className="w-full md:w-[200px] lg:w-[300px] pl-8"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  aria-label="Search products"
+                  autoComplete="off"
+                />
+              </div>
+            </form>
+            <SearchDropdown
+              query={searchQuery}
+              isOpen={isSearchDropdownOpen}
+              onClose={() => setIsSearchDropdownOpen(false)}
+              onNavigate={handleNavigateToProducts}
+            />
+          </div>
 
           {/* Mobile Search */}
           <Button
             variant="ghost"
             size="icon"
             className="md:hidden"
-            onClick={() => router.push("/search")}
-            aria-label="Open search page"
+            onClick={() => router.push("/products")}
+            aria-label="Open products page"
           >
             <Search className="w-5 h-5" />
           </Button>
