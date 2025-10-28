@@ -123,3 +123,4 @@ export default function HeroSection2() {
     </section>
   );
 }
+

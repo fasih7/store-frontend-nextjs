@@ -2,7 +2,7 @@
 import CategoryCard from "./category-card";
 import { Category } from "@/lib/types";
 import { useState, useEffect } from "react";
-import { categoriesGateway } from "@/domain/gateways/categories.gateway";
+import { categoriesGateway } from "@/domain/gateways/customer/categories.gateway";
 
 /**
  * The Categories component displays a list of categories.
@@ -62,3 +62,4 @@ function Categories() {
 }
 
 export default Categories;
+

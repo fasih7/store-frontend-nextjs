@@ -16,8 +16,8 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
-import { authGateway } from "@/domain/gateways/auth.gateway";
-import { useToast } from "@/hooks/use-toast";
+import { authGateway } from "@/domain/gateways/shared/auth.gateway";
+import { useToast } from "@/hooks/shared/use-toast";
 
 interface ForgotPasswordModalProps {
   open: boolean;
@@ -298,3 +298,4 @@ export function ForgotPasswordModal({
     </Dialog>
   );
 }
+

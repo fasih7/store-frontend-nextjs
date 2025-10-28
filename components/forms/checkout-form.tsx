@@ -18,9 +18,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { useEffect, useState } from "react";
 import { OTPModal } from "../dialogs/opt-modal";
 import { OrderDetails, SavedAddress, User } from "@/lib/types";
-import { ordersGateway } from "@/domain/gateways/orders.gateway";
-import { userGateway } from "@/domain/gateways/user.gateway";
-import { useCart } from "@/hooks/use-cart";
+import { ordersGateway } from "@/domain/gateways/customer/orders.gateway";
+import { userGateway } from "@/domain/gateways/customer/user.gateway";
+import { useCart } from "@/hooks/customer/use-cart";
 import { useRouter } from "next/navigation";
 import { AlertDialog, useAlert } from "../shared/alerts";
 
@@ -630,3 +630,4 @@ export default function CheckoutForm({
     </div>
   );
 }
+

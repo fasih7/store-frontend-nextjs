@@ -3,10 +3,10 @@
 import { Card, CardContent, CardFooter } from "../ui/card";
 import Link from "next/link";
 import { Button } from "../ui/button";
-import { useCart } from "@/hooks/use-cart";
-import { Product } from "@/lib/types";
+import { useCart } from "@/hooks/customer/use-cart";
+import { Product } from "@/domain/entities";
 import { ShoppingCart, Heart } from "lucide-react";
-import { useCartSheet } from "@/hooks/use-cart-sheet";
+import { useCartSheet } from "@/hooks/customer/use-cart-sheet";
 import { buildImageUrl } from "@/lib/utils";
 import { useState } from "react";
 
@@ -120,3 +120,4 @@ function ProductCard({ product }: Readonly<ProductCardProps>) {
 }
 
 export default ProductCard;
+

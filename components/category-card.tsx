@@ -56,3 +56,4 @@ function CategoryCard({ category }: Readonly<CategoryCardProps>) {
 }
 
 export default CategoryCard;
+

@@ -1,11 +1,11 @@
 "use client";
 
-import { productGateway } from "@/domain/gateways/products.gateway";
+import { productGateway } from "@/domain/gateways/customer/products.gateway";
 import { Category, Product } from "@/lib/types";
 import { useEffect, useState } from "react";
 import ProductCard from "./product-card";
 import FilterSidebar from "../filter-sidebar";
-import { categoriesGateway } from "@/domain/gateways/categories.gateway";
+import { categoriesGateway } from "@/domain/gateways/customer/categories.gateway";
 import { ProductsMobileFilter } from "./mobile-filter";
 import { useSearchParams } from "next/navigation";
 import { Input } from "../ui/input";
@@ -364,3 +364,4 @@ function Products() {
 }
 
 export default Products;
+

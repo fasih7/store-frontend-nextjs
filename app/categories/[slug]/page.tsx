@@ -1,8 +1,8 @@
 import Footer from "@/components/footer";
 import Navbar from "@/components/navbar";
 import ProductCard from "@/components/products/product-card";
-import { categoriesGateway } from "@/domain/gateways/categories.gateway";
-import { productGateway } from "@/domain/gateways/products.gateway";
+import { categoriesGateway } from "@/domain/gateways/customer/categories.gateway";
+import { productGateway } from "@/domain/gateways/customer/products.gateway";
 import { Product } from "@/lib/types";
 import { notFound } from "next/navigation";
 

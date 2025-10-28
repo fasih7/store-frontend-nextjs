@@ -2,8 +2,8 @@
 import { JSX, SVGProps, useEffect, useState } from "react";
 import CheckoutForm from "./forms/checkout-form";
 import CheckoutSummaryCard from "./cards/checkout-summary";
-import { userGateway } from "../domain/gateways/user.gateway";
-import { useCart } from "../hooks/use-cart";
+import { userGateway } from "@/domain/gateways/customer/user.gateway";
+import { useCart } from "@/hooks/customer/use-cart";
 import { Button } from "./ui/button";
 import { ShoppingCart, ArrowLeft } from "lucide-react";
 import Link from "next/link";

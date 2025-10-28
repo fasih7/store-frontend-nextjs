@@ -5,7 +5,7 @@ import {
   TruckIcon,
 } from "lucide-react";
 import { Separator } from "../ui/separator";
-import { useCart } from "@/hooks/use-cart";
+import { useCart } from "@/hooks/customer/use-cart";
 
 export default function CheckoutSummaryCard() {
   const { items, removeFromCart, updateQuantity, clearCart } = useCart();
@@ -68,3 +68,4 @@ export default function CheckoutSummaryCard() {
     </div>
   );
 }
+

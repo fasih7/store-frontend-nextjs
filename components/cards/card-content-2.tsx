@@ -67,3 +67,4 @@ export function CardContent2({ itemsArray }: { itemsArray: CardItem[] }) {
     </CardContent>
   );
 }
+

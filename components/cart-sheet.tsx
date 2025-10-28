@@ -11,8 +11,8 @@ import Link from "next/link";
 import { ScrollArea } from "./ui/scroll-area";
 import Image from "next/image";
 import { Separator } from "./ui/separator";
-import { useCart } from "@/hooks/use-cart";
-import { useCartSheet } from "@/hooks/use-cart-sheet";
+import { useCart } from "@/hooks/customer/use-cart";
+import { useCartSheet } from "@/hooks/customer/use-cart-sheet";
 import { buildImageUrl } from "@/lib/utils";
 export default function CartSheet() {
   const { items, removeFromCart, updateQuantity, clearCart } = useCart();
@@ -159,3 +159,4 @@ export default function CartSheet() {
     </Sheet>
   );
 }
+

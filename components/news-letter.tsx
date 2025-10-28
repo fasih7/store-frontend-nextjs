@@ -2,7 +2,7 @@
 
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/shared/use-toast";
 import { useState } from "react";
 import { newsletterSchema, type NewsletterData } from "@/lib/validations";
 import { Loader2, Mail } from "lucide-react";
@@ -178,3 +178,4 @@ function NewsLetter() {
 }
 
 export default NewsLetter;
+
