@@ -13,9 +13,9 @@ export default async function OrderSuccessPage({
 
   return (
     <>
-      <Navbar />
+      {/* <Navbar /> */}
       <OrderSuccess orderId={orderId} />
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 }

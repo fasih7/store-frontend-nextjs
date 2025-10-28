@@ -1,14 +1,6 @@
-import Footer from "@/components/footer";
-import Navbar from "@/components/navbar";
 import ProfilePageComponent from "@/components/profile-page-component";
 
+//TODO: Better naming for this page
 export default function Component() {
-  return (
-    <>
-      <Navbar />
-      <ProfilePageComponent />
-      <Footer />
-    </>
-  );
+  return <ProfilePageComponent />;
 }
-

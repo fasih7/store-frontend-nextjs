@@ -3,14 +3,7 @@ import Footer from "@/components/footer";
 import Navbar from "@/components/navbar";
 
 function ProductsPage() {
-  return (
-    <>
-      <Navbar />
-      <Checkout />
-      <Footer />
-    </>
-  );
+  return <Checkout />;
 }
 
 export default ProductsPage;
-
