@@ -9,30 +9,29 @@ export const ROUTES = {
   categories: "/categories",
   checkout: "/checkout",
   search: "/search",
-  
+
   // Profile routes
   profile: "/profile-page",
   profileTab: (tab: string) => `/profile-page?tab=${tab}`,
-  
+
   // Order routes
   orderSuccess: (orderId: string) => `/order-success/${orderId}`,
   guestOrderSuccess: "/guest-order-success",
-  
+
   // Auth routes
   auth: {
     login: "/auth",
     forgotPassword: "/auth?mode=forgot",
   },
-  
-  // Admin routes (placeholder for future implementation)
+
+  // Admin routes
   admin: {
     dashboard: "/admin",
     products: "/admin/products",
     orders: "/admin/orders",
+    categories: "/admin/categories",
     users: "/admin/users",
+    settings: "/admin/settings",
     analytics: "/admin/analytics",
   },
 } as const;
-
-
-
