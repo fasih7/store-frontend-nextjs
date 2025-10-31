@@ -3,7 +3,7 @@
 // import Navbar from "@/components/navbar";
 // import Footer from "@/components/footer";
 import Image from "next/image";
-import { notFound } from "next/navigation";
+import { useRouter } from "next/navigation";
 import AddToCartButton from "@/components/add-to-cart-button";
 import { Product } from "@/lib/types";
 import React, { useState, useEffect } from "react";
@@ -31,10 +31,21 @@ interface ProductImageGalleryProps {
   onImageSelect: (index: number) => void;
 }
 
-function ProductImageGallery({ product, selectedImage, onImageSelect }: ProductImageGalleryProps) {
-  const currentImage = product?.images && product.images.length > 0 
-    ? product.images[selectedImage] 
-    : product?.primaryImage;
+function ProductImageGallery({
+  product,
+  selectedImage,
+  onImageSelect,
+}: ProductImageGalleryProps) {
+  // Build gallery with primary image first, then other images (excluding duplicates)
+  const galleryImages = (
+    [
+      ...(product?.primaryImage ? [product.primaryImage] : []),
+      ...(product?.images || []),
+    ] as string[]
+  ).filter((img, index, arr) => !!img && arr.indexOf(img) === index);
+
+  const currentImage =
+    galleryImages.length > 0 ? galleryImages[selectedImage] : undefined;
 
   return (
     <div className="space-y-4">
@@ -51,9 +62,9 @@ function ProductImageGallery({ product, selectedImage, onImageSelect }: ProductI
       </div>
 
       {/* Image Thumbnails */}
-      {product?.images && product.images.length > 1 && (
+      {galleryImages.length > 1 && (
         <div className="flex gap-3 overflow-x-auto pb-2">
-          {product.images.map((image, index) => (
+          {galleryImages.map((image, index) => (
             <button
               key={index}
               onClick={() => onImageSelect(index)}
@@ -65,7 +76,7 @@ function ProductImageGallery({ product, selectedImage, onImageSelect }: ProductI
             >
               <Image
                 src={buildImageUrl(image)}
-                alt={`${product.title} ${index + 1}`}
+                alt={`${product?.title || "Product"} ${index + 1}`}
                 width={80}
                 height={80}
                 className="object-contain w-full h-full"
@@ -86,7 +97,12 @@ interface ProductHeaderProps {
   onShare: () => void;
 }
 
-function ProductHeader({ product, isWishlisted, onToggleWishlist, onShare }: ProductHeaderProps) {
+function ProductHeader({
+  product,
+  isWishlisted,
+  onToggleWishlist,
+  onShare,
+}: ProductHeaderProps) {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
@@ -98,22 +114,13 @@ function ProductHeader({ product, isWishlisted, onToggleWishlist, onShare }: Pro
             variant="ghost"
             size="sm"
             onClick={onToggleWishlist}
-            className={`p-2 ${
-              isWishlisted ? "text-red-500" : "text-gray-400"
-            }`}
+            className={`p-2 ${isWishlisted ? "text-red-500" : "text-gray-400"}`}
           >
             <Heart
-              className={`h-5 w-5 ${
-                isWishlisted ? "fill-current" : ""
-              }`}
+              className={`h-5 w-5 ${isWishlisted ? "fill-current" : ""}`}
             />
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onShare}
-            className="p-2"
-          >
+          <Button variant="ghost" size="sm" onClick={onShare} className="p-2">
             <Share2 className="h-5 w-5" />
           </Button>
         </div>
@@ -126,15 +133,10 @@ function ProductHeader({ product, isWishlisted, onToggleWishlist, onShare }: Pro
       <div className="flex items-center gap-2">
         <div className="flex items-center">
           {[...Array(5)].map((_, i) => (
-            <Star
-              key={i}
-              className="h-4 w-4 fill-yellow-400 text-yellow-400"
-            />
+            <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
           ))}
         </div>
-        <span className="text-sm text-gray-500">
-          (4.8) • 124 reviews
-        </span>
+        <span className="text-sm text-gray-500">(4.8) • 124 reviews</span>
       </div>
     </div>
   );
@@ -147,7 +149,7 @@ interface ProductPriceProps {
 
 function ProductPrice({ product }: ProductPriceProps) {
   const price = product?.price ? parseFloat(product.price) : 0;
-  
+
   return (
     <div className="space-y-2">
       <div className="flex items-baseline gap-3">
@@ -161,9 +163,7 @@ function ProductPrice({ product }: ProductPriceProps) {
           Save 20%
         </Badge>
       </div>
-      <p className="text-sm text-gray-600">
-        Free shipping on orders over $50
-      </p>
+      <p className="text-sm text-gray-600">Free shipping on orders over $50</p>
     </div>
   );
 }
@@ -174,12 +174,13 @@ interface QuantitySelectorProps {
   onQuantityChange: (change: number) => void;
 }
 
-function QuantitySelector({ quantity, onQuantityChange }: QuantitySelectorProps) {
+function QuantitySelector({
+  quantity,
+  onQuantityChange,
+}: QuantitySelectorProps) {
   return (
     <div className="space-y-3">
-      <label className="text-sm font-medium text-gray-700">
-        Quantity
-      </label>
+      <label className="text-sm font-medium text-gray-700">Quantity</label>
       <div className="flex items-center gap-3">
         <Button
           variant="outline"
@@ -190,9 +191,7 @@ function QuantitySelector({ quantity, onQuantityChange }: QuantitySelectorProps)
         >
           <Minus className="h-4 w-4" />
         </Button>
-        <span className="w-12 text-center font-medium">
-          {quantity}
-        </span>
+        <span className="w-12 text-center font-medium">{quantity}</span>
         <Button
           variant="outline"
           size="sm"
@@ -246,6 +245,7 @@ export default function SingleProductPage({
   params: Promise<Params>;
 }) {
   const { id } = React.use(params);
+  const router = useRouter();
 
   const [product, setProduct] = useState<Product>();
   const [loading, setLoading] = useState(true);
@@ -259,10 +259,24 @@ export default function SingleProductPage({
         const product = await productGateway.getProductById(id);
         console.log({ product });
 
+        // Treat API responses that encode errors in the body as not found
+        const errorLike = product as any;
+        const hasNotFoundShape =
+          !product ||
+          errorLike?.statusCode === 404 ||
+          errorLike?.error === "Not Found" ||
+          /not\s*found/i.test(errorLike?.message || "");
+
+        if (hasNotFoundShape) {
+          router.replace("/not-found");
+          return;
+        }
+
         setProduct(product);
       } catch (error) {
         console.error("Failed to load products", error);
-        return notFound();
+        router.replace("/not-found");
+        return;
       } finally {
         setLoading(false);
       }
@@ -327,6 +341,12 @@ export default function SingleProductPage({
     );
   }
 
+  // If product is missing for any reason, ensure we navigate away
+  if (!product) {
+    router.replace("/not-found");
+    return null;
+  }
+
   return (
     <>
       {/* <Navbar /> */}
@@ -335,7 +355,7 @@ export default function SingleProductPage({
         <div className="container mx-auto px-4 py-8 md:py-12 md:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Product Images */}
-            <ProductImageGallery 
+            <ProductImageGallery
               product={product}
               selectedImage={selectedImage}
               onImageSelect={setSelectedImage}

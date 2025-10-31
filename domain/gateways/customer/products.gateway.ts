@@ -4,20 +4,37 @@ export class ProductGateway extends HttpClient {
   constructor() {
     super(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}`);
   }
+  async createProduct(form: FormData) {
+    return this.post(`/products`, form);
+  }
+  async updateProduct(id: string, form: FormData) {
+    return this.put(`/products/${id}`, form);
+  }
   async getManyProducts(options?: any) {
-    let queryOptions = "?";
-    options?.limit && (queryOptions += `pageNumber=1&limit=${options.limit}`);
-    options?.sortBy &&
-      (queryOptions += `&sortBy=${options.sortBy}&sortOrder=${
-        options.order || 1
-      }`);
-    options?.category && (queryOptions += `&category=${options.category}`);
-    options?.searchQuery &&
-      (queryOptions += `&searchQuery=${encodeURIComponent(
-        options.searchQuery
-      )}`);
+    const params = new URLSearchParams();
 
-    console.log({ queryOptions });
+    if (options?.page) {
+      params.append("page", options.page.toString());
+    }
+    if (options?.limit) {
+      params.append("limit", options.limit.toString());
+    }
+    if (options?.sortBy) {
+      params.append("sortBy", options.sortBy);
+      params.append("sortOrder", (options.order || 1).toString());
+    }
+    if (options?.category) {
+      params.append("category", options.category);
+    }
+    if (options?.searchQuery) {
+      params.append("searchQuery", options.searchQuery);
+    }
+    if (options?.relations) {
+      params.append("relations", options.relations);
+    }
+
+    const queryString = params.toString();
+    const queryOptions = queryString ? `?${queryString}` : "";
 
     return await this.get(`/products${queryOptions}`);
   }
@@ -39,11 +56,10 @@ export class ProductGateway extends HttpClient {
       `/products/search?searchQuery=${encodeURIComponent(searchQuery)}`
     );
   }
+
+  async deleteProduct(id: string) {
+    return this.delete(`/products/${id}`);
+  }
 }
 
 export const productGateway = new ProductGateway();
-
-
-
-
-
