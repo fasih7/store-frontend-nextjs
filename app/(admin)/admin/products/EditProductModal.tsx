@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -55,10 +54,10 @@ type FormValues = z.infer<typeof schema>;
 
 interface EditProductModalProps {
   product: Product;
+  onProductUpdated?: () => void;
 }
 
-export default function EditProductModal({ product }: EditProductModalProps) {
-  const router = useRouter();
+export default function EditProductModal({ product, onProductUpdated }: EditProductModalProps) {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -215,7 +214,7 @@ export default function EditProductModal({ product }: EditProductModalProps) {
         variant: "success",
       });
       setOpen(false);
-      router.refresh();
+      onProductUpdated?.();
     } catch (e: any) {
       const description =
         e?.body?.message || e?.message || "Failed to update product";

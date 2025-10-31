@@ -21,6 +21,18 @@ export interface Product {
   };
 }
 
+export interface ProductPaginationResponse {
+  data: Product[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    itemsPerPage: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
+}
+
 
 
 

@@ -19,6 +19,11 @@ export class OrdersGateway extends HttpClient {
     return response;
   }
 
+  async getOrderDetailsForAdmin(id: string) {
+    const response = await this.get(`/admin/order/${id}`);
+    return response;
+  }
+
   async getCurrentUserOrders() {
     const response = await this.get("/me");
     return response;
@@ -29,6 +34,11 @@ export class OrdersGateway extends HttpClient {
     return response;
   }
 
+  async getOrdersWithPagination(page: number, limit: number) {
+    const response = await this.get(`?limit=${limit}&page=${page}`);
+    return response;
+  }
+
   async verifyEmailForOrder(email: string, firstName: string) {
     const response = await this.post("/verification-email-for-order", {
       email,
@@ -36,11 +46,11 @@ export class OrdersGateway extends HttpClient {
     });
     return response;
   }
+
+  async updateOrderStatus(orderId: string, status: string) {
+    const response = await this.patch(`/${orderId}/status`, { status });
+    return response;
+  }
 }
 
 export const ordersGateway = new OrdersGateway();
-
-
-
-
-

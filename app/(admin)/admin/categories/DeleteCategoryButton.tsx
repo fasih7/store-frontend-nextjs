@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -14,26 +15,42 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Trash2 } from "lucide-react";
-import { productGateway } from "@/domain/gateways/customer/products.gateway";
+import { categoriesGateway } from "@/domain/gateways/customer/categories.gateway";
+import { useToast } from "@/hooks/shared/use-toast";
 
-type DeleteProductButtonProps = {
-  productId: string;
-  productTitle?: string;
-  onProductDeleted?: () => void;
+type DeleteCategoryButtonProps = {
+  categoryId: string;
+  categoryName?: string;
 };
 
-export default function DeleteProductButton({
-  productId,
-  productTitle,
-  onProductDeleted,
-}: DeleteProductButtonProps) {
+export default function DeleteCategoryButton({
+  categoryId,
+  categoryName,
+}: DeleteCategoryButtonProps) {
+  const router = useRouter();
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleConfirmDelete() {
     try {
       setIsLoading(true);
-      await productGateway.deleteProduct(productId);
-      onProductDeleted?.();
+      await categoriesGateway.deleteCategory(categoryId);
+      toast({
+        title: "Category deleted",
+        description: categoryName
+          ? `"${categoryName}" has been deleted successfully.`
+          : "Category has been deleted successfully.",
+        variant: "success",
+      });
+      router.refresh();
+    } catch (e: any) {
+      const description =
+        e?.body?.message || e?.message || "Failed to delete category";
+      toast({
+        title: "Delete failed",
+        description,
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -43,15 +60,16 @@ export default function DeleteProductButton({
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button size="sm" variant="destructive" disabled={isLoading}>
-          <Trash2 className="mr-1 h-4 w-4" /> {isLoading ? "Deleting..." : "Delete"}
+          <Trash2 className="mr-1 h-4 w-4" />{" "}
+          {isLoading ? "Deleting..." : "Delete"}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete product?</AlertDialogTitle>
+          <AlertDialogTitle>Delete category?</AlertDialogTitle>
           <AlertDialogDescription>
             This action cannot be undone. This will permanently delete
-            {productTitle ? ` "${productTitle}"` : " this product"}.
+            {categoryName ? ` "${categoryName}"` : " this category"}.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -64,5 +82,3 @@ export default function DeleteProductButton({
     </AlertDialog>
   );
 }
-
-

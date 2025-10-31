@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -51,8 +50,11 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
-export function AddProductModal() {
-  const router = useRouter();
+type AddProductModalProps = {
+  onProductAdded?: () => void;
+};
+
+export function AddProductModal({ onProductAdded }: AddProductModalProps) {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -145,7 +147,7 @@ export function AddProductModal() {
       });
       setOpen(false);
       resetAll();
-      router.refresh();
+      onProductAdded?.();
     } catch (e: any) {
       const description =
         e?.body?.message || e?.message || "Failed to create product";
