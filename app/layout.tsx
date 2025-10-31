@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { CartProvider } from "@/hooks/use-cart";
+import { CartProvider } from "@/hooks/customer/use-cart";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -82,3 +82,4 @@ export default function RootLayout({
     </AuthProvider>
   );
 }
+

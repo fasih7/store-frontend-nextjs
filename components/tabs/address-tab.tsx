@@ -20,7 +20,7 @@ import { Edit, Plus, Trash2 } from "lucide-react";
 import { SavedAddress, User } from "@/lib/types";
 import AddressModal from "@/components/dialogs/address-modal";
 import { useAlert } from "@/components/shared/alerts";
-import { userGateway } from "@/domain/gateways/user.gateway";
+import { userGateway } from "@/domain/gateways/customer/user.gateway";
 
 interface AddressTabProps {
   savedAddresses: SavedAddress[];
@@ -193,3 +193,4 @@ export default function AddressTab({
     </TabsContent>
   );
 }
+

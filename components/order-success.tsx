@@ -11,7 +11,7 @@ import {
   Home,
 } from "lucide-react";
 import Link from "next/link";
-import { ordersGateway } from "@/domain/gateways/orders.gateway";
+import { ordersGateway } from "@/domain/gateways/customer/orders.gateway";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
 
@@ -254,3 +254,4 @@ export default async function OrderSuccess({
     </div>
   );
 }
+

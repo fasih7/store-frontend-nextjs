@@ -10,8 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { TabsContent } from "@/components/ui/tabs";
 import { useState, useEffect } from "react";
-import { userGateway } from "@/domain/gateways/user.gateway";
-import { useToast } from "@/hooks/use-toast";
+import { userGateway } from "@/domain/gateways/customer/user.gateway";
+import { useToast } from "@/hooks/shared/use-toast";
 
 export default function ProfileTabContent({ user }: Record<string, any>) {
   const [formData, setFormData] = useState({
@@ -168,3 +168,4 @@ export default function ProfileTabContent({ user }: Record<string, any>) {
     </TabsContent>
   );
 }
+

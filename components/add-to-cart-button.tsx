@@ -1,11 +1,11 @@
 "use client";
 
-import { useCart } from "@/hooks/use-cart";
+import { useCart } from "@/hooks/customer/use-cart";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Loader2 } from "lucide-react";
 import { Product } from "@/lib/types";
-import { useCartSheet } from "@/hooks/use-cart-sheet";
-import { useToast } from "@/hooks/use-toast";
+import { useCartSheet } from "@/hooks/customer/use-cart-sheet";
+import { useToast } from "@/hooks/shared/use-toast";
 import { useState } from "react";
 
 interface ProductCartProps {
@@ -75,3 +75,4 @@ export default function AddToCartButton({ product, className }: any) {
     </Button>
   );
 }
+

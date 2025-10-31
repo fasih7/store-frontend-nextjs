@@ -99,3 +99,4 @@ function generateBreadcrumbItems(pathname: string): BreadcrumbItem[] {
 
   return items;
 }
+

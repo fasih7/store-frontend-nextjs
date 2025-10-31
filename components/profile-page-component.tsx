@@ -7,9 +7,9 @@ import ProfileTabContent from "@/components/tabs/profile-tab-content";
 import ProfileTabs from "@/components/tabs/profile-tabs";
 import WishlistTab from "@/components/tabs/wishlist-tab";
 import { Tabs } from "@/components/ui/tabs";
-import { userGateway } from "@/domain/gateways/user.gateway";
+import { userGateway } from "@/domain/gateways/customer/user.gateway";
 import { useEffect, useState } from "react";
-import { ordersGateway } from "../domain/gateways/orders.gateway";
+import { ordersGateway } from "@/domain/gateways/customer/orders.gateway";
 
 export default function ProfilePageComponent() {
   const [user, setUser] = useState(null);

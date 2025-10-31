@@ -28,17 +28,28 @@ export function ProductsMobileFilter({
   clearAllFilters,
 }: MobileFilterProps) {
   return (
-    <div className="flex md:hidden justify-between items-center mb-4">
-      <h1 className="text-2xl font-bold">Search Products</h1>
+    <div className="flex md:hidden justify-between items-center mb-6">
+      <div>
+        <h1 className="text-2xl font-extrabold gradient-text-primary">
+          Products
+        </h1>
+        <p className="text-sm text-muted-foreground">Browse our collection</p>
+      </div>
       <Sheet>
         <SheetTrigger asChild>
-          <Button variant="outline" size="sm">
-            <SlidersHorizontal className="h-4 w-4 mr-2" />
+          <Button
+            className="glass-button border-2 shadow-lg hover:shadow-xl transition-all hover:scale-105"
+            size="lg"
+          >
+            <SlidersHorizontal className="h-5 w-5 mr-2" />
             Filters
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-[300px] sm:w-[400px]">
-          <div className="py-4">
+        <SheetContent
+          side="left"
+          className="w-[300px] sm:w-[400px] glass-panel border-0 backdrop-blur-3xl"
+        >
+          <div className="py-6">
             <FilterSidebar
               categories={categories}
               selectedCategories={selectedCategories}
@@ -57,3 +68,4 @@ export function ProductsMobileFilter({
     </div>
   );
 }
+

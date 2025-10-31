@@ -21,3 +21,4 @@ export function FullPageLoading({ message = "Loading..." }: PageLoadingProps) {
     </div>
   );
 }
+
