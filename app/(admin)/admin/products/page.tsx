@@ -6,9 +6,15 @@ import type { Product } from "@/domain/entities/product.entity";
 import Image from "next/image";
 import Link from "next/link";
 import { buildImageUrl } from "../../../../lib/utils";
+import AddProductModal from "./AddProductModal";
+import EditProductModal from "./EditProductModal";
+import DeleteProductButton from "./DeleteProductButton";
 
 export default async function ProductsPage() {
-  const productsResponse = await productGateway.getManyProducts({ limit: 20 });
+  const productsResponse = await productGateway.getManyProducts({
+    limit: 20,
+    relations: ["category"],
+  });
   const products: Product[] = productsResponse?.data || [];
 
   return (
@@ -20,12 +26,7 @@ export default async function ProductsPage() {
             Manage your product inventory and listings
           </p>
         </div>
-        <Button asChild>
-          <Link href="/admin/products/new">
-            <Plus className="mr-2 h-4 w-4" />
-            Add Product
-          </Link>
-        </Button>
+        <AddProductModal />
       </div>
 
       <Card>
@@ -77,14 +78,11 @@ export default async function ProductsPage() {
                       <td className="py-2 pr-4">{p.quantity}</td>
                       <td className="py-2 pr-4">
                         <div className="flex items-center justify-end gap-2">
-                          <Button asChild size="sm" variant="outline">
-                            <Link href={`/admin/products/${p.id}/edit`}>
-                              <Pencil className="mr-1 h-4 w-4" /> Edit
-                            </Link>
-                          </Button>
-                          <Button size="sm" variant="destructive">
-                            <Trash2 className="mr-1 h-4 w-4" /> Delete
-                          </Button>
+                          <EditProductModal product={p} />
+                          <DeleteProductButton
+                            productId={p.id}
+                            productTitle={p.title}
+                          />
                         </div>
                       </td>
                     </tr>

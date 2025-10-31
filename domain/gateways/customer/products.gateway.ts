@@ -4,6 +4,12 @@ export class ProductGateway extends HttpClient {
   constructor() {
     super(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}`);
   }
+  async createProduct(form: FormData) {
+    return this.post(`/products`, form);
+  }
+  async updateProduct(id: string, form: FormData) {
+    return this.put(`/products/${id}`, form);
+  }
   async getManyProducts(options?: any) {
     let queryOptions = "?";
     options?.limit && (queryOptions += `pageNumber=1&limit=${options.limit}`);
@@ -16,7 +22,7 @@ export class ProductGateway extends HttpClient {
       (queryOptions += `&searchQuery=${encodeURIComponent(
         options.searchQuery
       )}`);
-
+    options?.relations && (queryOptions += `&relations=${options.relations}`);
     console.log({ queryOptions });
 
     return await this.get(`/products${queryOptions}`);
@@ -39,11 +45,10 @@ export class ProductGateway extends HttpClient {
       `/products/search?searchQuery=${encodeURIComponent(searchQuery)}`
     );
   }
+
+  async deleteProduct(id: string) {
+    return this.delete(`/products/${id}`);
+  }
 }
 
 export const productGateway = new ProductGateway();
-
-
-
-
-

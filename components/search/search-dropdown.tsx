@@ -145,9 +145,10 @@ export default function SearchDropdown({
                           <span className="text-sm font-semibold text-primary">
                             Rs.{product.price}
                           </span>
-                          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                          {/* TODO: Add category name later in response */}
+                          {/* <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
                             {product.category.name}
-                          </span>
+                          </span> */}
                         </div>
                       </div>
                     </div>
@@ -173,4 +174,3 @@ export default function SearchDropdown({
     </div>
   );
 }
-
