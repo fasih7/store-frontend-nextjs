@@ -23,6 +23,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import FilterBar from "@/components/admin/filter-bar/FilterBar";
+import type { FilterConfig, FilterValues } from "@/components/admin/filter-bar/types";
 
 const statusColorMap: Record<Status, string> = {
   [Status.active]: "bg-green-100 text-green-800 border-green-200",
@@ -39,7 +41,7 @@ export default function UsersPage() {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(10);
   const [pagination, setPagination] = useState<
     UsersPaginationResponse["pagination"] | null
   >(null);
@@ -48,13 +50,29 @@ export default function UsersPage() {
     Record<string, Status>
   >({});
   const [saving, setSaving] = useState(false);
+  const [filterValues, setFilterValues] = useState<FilterValues>({
+    searchQuery: "",
+    limit: "10",
+  });
 
   useEffect(() => {
     async function fetchUsers() {
       try {
         setLoading(true);
         const response: UsersPaginationResponse =
-          await adminUsersGateway.getAllUsers(currentPage, pageSize);
+          await adminUsersGateway.getAllUsers(
+            currentPage,
+            parseInt(filterValues.limit || "10"),
+            {
+              searchQuery: filterValues.searchQuery,
+              status:
+                Array.isArray(filterValues.status) && filterValues.status.length > 0
+                  ? filterValues.status.join(",")
+                  : undefined,
+              sortBy: filterValues.sortBy,
+              sortOrder: filterValues.sortOrder ? parseInt(filterValues.sortOrder) : undefined,
+            }
+          );
         setUsers(response.data);
         setPagination(response.pagination);
 
@@ -75,7 +93,11 @@ export default function UsersPage() {
     }
 
     fetchUsers();
-  }, [currentPage, pageSize]);
+  }, [currentPage, filterValues]);
+
+  useEffect(() => {
+    setPageSize(parseInt(filterValues.limit || "10"));
+  }, [filterValues.limit]);
 
   const handlePreviousPage = () => {
     if (pagination?.hasPreviousPage) {
@@ -102,6 +124,11 @@ export default function UsersPage() {
     );
   };
 
+  const handleFilterChange = (values: FilterValues) => {
+    setFilterValues(values);
+    setCurrentPage(1); // Reset to page 1 when filters change
+  };
+
   const handleSave = async () => {
     const changedUsers = Object.keys(userStatuses).filter(
       (userId) => userStatuses[userId] !== originalStatuses[userId]
@@ -120,9 +147,21 @@ export default function UsersPage() {
       // Update original statuses
       setOriginalStatuses({ ...userStatuses });
 
-      // Refresh the users list
+      // Refresh the users list with current filters
       const response: UsersPaginationResponse =
-        await adminUsersGateway.getAllUsers(currentPage, pageSize);
+        await adminUsersGateway.getAllUsers(
+          currentPage,
+          parseInt(filterValues.limit || "10"),
+          {
+            searchQuery: filterValues.searchQuery,
+            status:
+              Array.isArray(filterValues.status) && filterValues.status.length > 0
+                ? filterValues.status.join(",")
+                : undefined,
+            sortBy: filterValues.sortBy,
+            sortOrder: parseInt(filterValues.sortOrder || "-1"),
+          }
+        );
       setUsers(response.data);
       setPagination(response.pagination);
 
@@ -141,6 +180,36 @@ export default function UsersPage() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const filterConfig: FilterConfig = {
+    fields: [
+      {
+        key: "searchQuery",
+        type: "search",
+        label: "Search",
+        placeholder: "Search users by name or email...",
+      },
+      {
+        key: "status",
+        type: "multiselect",
+        label: "Status",
+        placeholder: "Select status",
+        options: [
+          { label: "Active", value: Status.active },
+          { label: "Pending", value: Status.pending },
+          { label: "Blocked", value: Status.blocked },
+          { label: "Guest", value: Status.guest },
+        ],
+      },
+    ],
+    sortByOptions: [
+      { label: "Created Date", value: "createdAt" },
+      { label: "Name", value: "name" },
+      { label: "Email", value: "email" },
+    ],
+    resultsPerPageOptions: [10, 20, 50, 100],
+    defaultResultsPerPage: 10,
   };
 
   return (
@@ -168,6 +237,8 @@ export default function UsersPage() {
           </Button>
         )}
       </div>
+
+      <FilterBar config={filterConfig} onFilterChange={handleFilterChange} />
 
       <Card>
         <CardHeader>

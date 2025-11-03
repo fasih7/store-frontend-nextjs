@@ -34,8 +34,38 @@ export class OrdersGateway extends HttpClient {
     return response;
   }
 
-  async getOrdersWithPagination(page: number, limit: number) {
-    const response = await this.get(`?limit=${limit}&page=${page}`);
+  async getOrdersWithPagination(
+    page: number,
+    limit: number,
+    options?: {
+      searchQuery?: string;
+      status?: string;
+      sortBy?: string;
+      sortOrder?: number;
+    }
+  ) {
+    const params = new URLSearchParams();
+
+    params.append("page", page.toString());
+    params.append("limit", limit.toString());
+
+    if (options?.searchQuery) {
+      params.append("searchQuery", options.searchQuery);
+    }
+
+    if (options?.status) {
+      params.append("status", options.status);
+    }
+
+    if (options?.sortBy) {
+      params.append("sortBy", options.sortBy);
+      params.append("sortOrder", (options.sortOrder || -1).toString());
+    }
+
+    const queryString = params.toString();
+    const queryOptions = queryString ? `?${queryString}` : "";
+
+    const response = await this.get(queryOptions);
     return response;
   }
 

@@ -12,6 +12,11 @@ import type {
 import { getReadableDate } from "@/shared/helpers";
 import { Eye, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import ViewOrderModal from "./ViewOrderModal";
+import FilterBar from "@/components/admin/filter-bar/FilterBar";
+import type {
+  FilterConfig,
+  FilterValues,
+} from "@/components/admin/filter-bar/types";
 
 const statusColorMap: Record<string, string> = {
   Delivered: "bg-green-100 text-green-800",
@@ -25,19 +30,38 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(10);
   const [pagination, setPagination] = useState<
     OrderPaginationResponse["pagination"] | null
   >(null);
   const [totalOrders, setTotalOrders] = useState(0);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [filterValues, setFilterValues] = useState<FilterValues>({
+    searchQuery: "",
+    limit: "10",
+  });
 
   useEffect(() => {
     async function fetchOrders() {
       try {
         setLoading(true);
         const response: OrderPaginationResponse =
-          await ordersGateway.getOrdersWithPagination(currentPage, pageSize);
+          await ordersGateway.getOrdersWithPagination(
+            currentPage,
+            parseInt(filterValues.limit || "10"),
+            {
+              searchQuery: filterValues.searchQuery,
+              status:
+                Array.isArray(filterValues.status) &&
+                filterValues.status.length > 0
+                  ? filterValues.status.join(",")
+                  : undefined,
+              sortBy: filterValues.sortBy,
+              sortOrder: filterValues.sortOrder
+                ? parseInt(filterValues.sortOrder)
+                : undefined,
+            }
+          );
         setOrders(response.data);
         setPagination(response.pagination);
         setTotalOrders(response.total);
@@ -49,7 +73,11 @@ export default function OrdersPage() {
     }
 
     fetchOrders();
-  }, [currentPage, pageSize]);
+  }, [currentPage, filterValues]);
+
+  useEffect(() => {
+    setPageSize(parseInt(filterValues.limit || "10"));
+  }, [filterValues.limit]);
 
   const handlePreviousPage = () => {
     if (pagination?.hasPreviousPage) {
@@ -63,20 +91,74 @@ export default function OrdersPage() {
     }
   };
 
+  const handleFilterChange = (values: FilterValues) => {
+    setFilterValues(values);
+    setCurrentPage(1); // Reset to page 1 when filters change
+  };
+
   const handleStatusUpdate = () => {
     // Refresh orders list after status update
     async function refreshOrders() {
       try {
+        setLoading(true);
         const response: OrderPaginationResponse =
-          await ordersGateway.getOrdersWithPagination(currentPage, pageSize);
+          await ordersGateway.getOrdersWithPagination(
+            currentPage,
+            parseInt(filterValues.limit || "10"),
+            {
+              searchQuery: filterValues.searchQuery,
+              status:
+                Array.isArray(filterValues.status) &&
+                filterValues.status.length > 0
+                  ? filterValues.status.join(",")
+                  : undefined,
+              sortBy: filterValues.sortBy,
+              sortOrder: filterValues.sortOrder
+                ? parseInt(filterValues.sortOrder)
+                : undefined,
+            }
+          );
         setOrders(response.data);
         setPagination(response.pagination);
         setTotalOrders(response.total);
       } catch (error) {
         console.error("Failed to refresh orders:", error);
+      } finally {
+        setLoading(false);
       }
     }
     refreshOrders();
+  };
+
+  const filterConfig: FilterConfig = {
+    fields: [
+      {
+        key: "searchQuery",
+        type: "search",
+        label: "Search",
+        placeholder: "Search orders, customer, or order ID...",
+      },
+      {
+        key: "status",
+        type: "multiselect",
+        label: "Status",
+        placeholder: "Select status",
+        options: [
+          { label: "Pending", value: "Pending" },
+          { label: "Confirmed", value: "Confirmed" },
+          { label: "Shipped", value: "Shipped" },
+          { label: "Delivered", value: "Delivered" },
+          { label: "Cancelled", value: "Cancelled" },
+        ],
+      },
+    ],
+    sortByOptions: [
+      { label: "Created Date", value: "createdAt" },
+      { label: "Total Price", value: "totalPrice" },
+      { label: "Status", value: "status" },
+    ],
+    resultsPerPageOptions: [10, 20, 50, 100],
+    defaultResultsPerPage: 10,
   };
 
   const formatPrice = (price: string) => {
@@ -97,6 +179,8 @@ export default function OrdersPage() {
           </p>
         </div>
       </div>
+
+      <FilterBar config={filterConfig} onFilterChange={handleFilterChange} />
 
       <Card>
         <CardHeader>
