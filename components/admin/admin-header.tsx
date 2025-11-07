@@ -36,7 +36,7 @@ export function AdminHeader() {
         </div>
 
         {/* Search */}
-        <div className="hidden md:flex items-center gap-2">
+        {/* <div className="hidden md:flex items-center gap-2">
           <div className="relative w-72 group">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors group-focus-within:text-primary z-10" />
             <Input 
@@ -50,14 +50,14 @@ export function AdminHeader() {
               )} 
             />
           </div>
-        </div>
+        </div> */}
 
         {/* Actions */}
         <div className="flex items-center gap-2">
           {/* Notifications */}
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             className={cn(
               "relative h-10 w-10 rounded-xl transition-all duration-200 group",
               "hover:bg-accent/50 hover:scale-105 hover:shadow-md",
@@ -72,8 +72,8 @@ export function AdminHeader() {
           </Button>
 
           {/* Settings */}
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             size="icon"
             className={cn(
               "h-10 w-10 rounded-xl transition-all duration-200",
@@ -87,8 +87,8 @@ export function AdminHeader() {
           {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 className={cn(
                   "relative h-10 w-10 rounded-xl p-0 transition-all duration-200",
                   "hover:scale-105 hover:shadow-md hover:ring-2 hover:ring-primary/20",
@@ -102,8 +102,8 @@ export function AdminHeader() {
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent 
-              align="end" 
+            <DropdownMenuContent
+              align="end"
               className={cn(
                 "w-64 glass-panel backdrop-blur-xl border-border/50 shadow-xl",
                 "p-2"
@@ -113,7 +113,7 @@ export function AdminHeader() {
                 My Account
               </DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-border/50" />
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 className={cn(
                   "px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200",
                   "hover:bg-accent/50 focus:bg-accent/50"
@@ -122,7 +122,7 @@ export function AdminHeader() {
                 <User className="mr-2 h-4 w-4" />
                 Profile
               </DropdownMenuItem>
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 className={cn(
                   "px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200",
                   "hover:bg-accent/50 focus:bg-accent/50"
@@ -132,13 +132,13 @@ export function AdminHeader() {
                 Settings
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-border/50" />
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 className={cn(
                   "px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200",
                   "text-destructive focus:text-destructive focus:bg-destructive/10 hover:bg-destructive/10"
                 )}
               >
-                <LogOut className="mr-2 h-4 w-4" /> 
+                <LogOut className="mr-2 h-4 w-4" />
                 Log out
               </DropdownMenuItem>
             </DropdownMenuContent>
