@@ -5,7 +5,16 @@ export class AdminUsersGateway extends HttpClient {
     super(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/user`);
   }
 
-  async getAllUsers(page?: number, limit?: number) {
+  async getAllUsers(
+    page?: number,
+    limit?: number,
+    options?: {
+      searchQuery?: string;
+      status?: string;
+      sortBy?: string;
+      sortOrder?: number;
+    }
+  ) {
     const params = new URLSearchParams();
 
     if (page) {
@@ -13,6 +22,19 @@ export class AdminUsersGateway extends HttpClient {
     }
     if (limit) {
       params.append("limit", limit.toString());
+    }
+
+    if (options?.searchQuery) {
+      params.append("searchQuery", options.searchQuery);
+    }
+
+    if (options?.status) {
+      params.append("status", options.status);
+    }
+
+    if (options?.sortBy) {
+      params.append("sortBy", options.sortBy);
+      params.append("sortOrder", (options.sortOrder || -1).toString());
     }
 
     const queryString = params.toString();

@@ -331,9 +331,9 @@ export default function ViewOrderModal({
                         <h4 className="font-medium text-base mb-1">
                           {item.product.title}
                         </h4>
-                        <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                        {/* <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
                           {item.product.description}
-                        </p>
+                        </p> */}
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4 text-sm">
                             <span className="text-muted-foreground">

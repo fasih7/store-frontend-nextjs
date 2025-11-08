@@ -1,204 +1,229 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import {
-  Image as ImageIcon,
-  ChevronLeft,
-  ChevronRight,
-  Loader2,
-} from "lucide-react";
-import { productGateway } from "@/domain/gateways/customer/products.gateway";
-import type {
-  Product,
-  ProductPaginationResponse,
-} from "@/domain/entities/product.entity";
-import Image from "next/image";
-import { buildImageUrl } from "../../../../lib/utils";
+import { Loader2 } from "lucide-react";
+import { useCategories } from "@/hooks/admin/use-categories";
+import { useProducts } from "@/hooks/admin/use-products";
+import { useDebounce } from "@/hooks/shared/use-debounce";
+import type { FilterValues } from "@/components/admin/filter-bar/types";
 import AddProductModal from "./AddProductModal";
-import EditProductModal from "./EditProductModal";
-import DeleteProductButton from "./DeleteProductButton";
+import FilterBar from "@/components/admin/filter-bar/FilterBar";
+import type { FilterConfig } from "@/components/admin/filter-bar/types";
+import { ProductsTable } from "./components/ProductsTable";
+import { ProductsPagination } from "./components/ProductsPagination";
+import { ProductsSearch } from "./components/ProductsSearch";
 
+const DEFAULT_PAGE_SIZE = 10;
+
+/**
+ * Products management page component
+ * Handles product listing, filtering, searching, and pagination
+ */
 export default function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(10);
-  const [pagination, setPagination] = useState<
-    ProductPaginationResponse["pagination"] | null
-  >(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterValues, setFilterValues] = useState<FilterValues>({
+    limit: DEFAULT_PAGE_SIZE.toString(),
+  });
 
-  useEffect(() => {
-    async function fetchProducts() {
-      try {
-        setLoading(true);
-        const response: ProductPaginationResponse =
-          await productGateway.getManyProducts({
-            page: currentPage,
-            limit: pageSize,
-            relations: ["category"],
-          });
-        setProducts(response.data);
-        setPagination(response.pagination);
-      } catch (error) {
-        console.error("Failed to fetch products:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
+  // Debounce search query to avoid excessive API calls
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
-    fetchProducts();
-  }, [currentPage, pageSize]);
+  // Fetch categories for filter
+  const {
+    categories,
+    loading: categoriesLoading,
+    error: categoriesError,
+  } = useCategories();
 
-  const handlePreviousPage = () => {
+  // Calculate page size from filter values
+  const pageSize = useMemo(
+    () => parseInt(filterValues.limit || DEFAULT_PAGE_SIZE.toString(), 10),
+    [filterValues.limit]
+  );
+
+  // Fetch products with filters and pagination
+  const {
+    products,
+    pagination,
+    loading: productsLoading,
+    error: productsError,
+    refetch: refetchProducts,
+  } = useProducts({
+    page: currentPage,
+    limit: pageSize,
+    filterValues,
+    searchQuery: debouncedSearchQuery,
+  });
+
+  // Reset to first page when filters or search change
+  const handleFilterChange = useCallback((values: FilterValues) => {
+    setFilterValues(values);
+    setCurrentPage(1);
+  }, []);
+
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchQuery(value);
+    setCurrentPage(1);
+  }, []);
+
+  // Navigation handlers
+  const handlePreviousPage = useCallback(() => {
     if (pagination?.hasPreviousPage) {
       setCurrentPage((prev) => prev - 1);
     }
-  };
+  }, [pagination?.hasPreviousPage]);
 
-  const handleNextPage = () => {
+  const handleNextPage = useCallback(() => {
     if (pagination?.hasNextPage) {
       setCurrentPage((prev) => prev + 1);
     }
-  };
+  }, [pagination?.hasNextPage]);
 
-  const handleProductUpdate = () => {
-    // Refresh products list after update
-    async function refreshProducts() {
-      try {
-        const response: ProductPaginationResponse =
-          await productGateway.getManyProducts({
-            page: currentPage,
-            limit: pageSize,
-            relations: ["category"],
-          });
-        setProducts(response.data);
-        setPagination(response.pagination);
-      } catch (error) {
-        console.error("Failed to refresh products:", error);
-      }
-    }
-    refreshProducts();
-  };
+  // Handle product updates (add, edit, delete)
+  const handleProductUpdate = useCallback(() => {
+    refetchProducts();
+  }, [refetchProducts]);
+
+  // Build filter configuration
+  const filterConfig: FilterConfig = useMemo(
+    () => ({
+      fields: [
+        {
+          key: "category",
+          type: "multiselect",
+          label: "Category",
+          placeholder: "Select categories",
+          options: categories.map((cat) => ({
+            label: cat.name,
+            value: cat.id,
+          })),
+        },
+      ],
+      sortByOptions: [
+        { label: "Price", value: "price" },
+        { label: "Title", value: "title" },
+        { label: "Created Date", value: "createdAt" },
+        { label: "Quantity", value: "quantity" },
+      ],
+      resultsPerPageOptions: [10, 20, 50, 100],
+      defaultResultsPerPage: DEFAULT_PAGE_SIZE,
+    }),
+    [categories]
+  );
+
+  const isLoading = productsLoading || categoriesLoading;
+  const hasError = productsError || categoriesError;
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Products</h2>
-          <p className="text-muted-foreground">
-            Manage your product inventory and listings
-          </p>
-        </div>
-        <AddProductModal onProductAdded={handleProductUpdate} />
-      </div>
+      {/* Header Section */}
+      <PageHeader
+        searchQuery={searchQuery}
+        onSearchChange={handleSearchChange}
+        onProductAdded={handleProductUpdate}
+      />
 
+      {/* Filter Bar */}
+      <FilterBar config={filterConfig} onFilterChange={handleFilterChange} />
+
+      {/* Products List Card */}
       <Card>
         <CardHeader>
           <CardTitle>Products List</CardTitle>
         </CardHeader>
         <CardContent>
-          {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            </div>
-          ) : products.length === 0 ? (
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <ImageIcon className="h-4 w-4" />
-              <p>No products found.</p>
-            </div>
+          {isLoading ? (
+            <LoadingState />
+          ) : hasError ? (
+            <ErrorState
+              error={productsError || categoriesError}
+              onRetry={refetchProducts}
+            />
           ) : (
             <>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-left border-b">
-                      <th className="py-2 pr-4">Image</th>
-                      <th className="py-2 pr-4">Title</th>
-                      <th className="py-2 pr-4">Category</th>
-                      <th className="py-2 pr-4">Price</th>
-                      <th className="py-2 pr-4">Qty</th>
-                      <th className="py-2 pr-4 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {products.map((p) => (
-                      <tr key={p.id} className="border-b last:border-0">
-                        <td className="py-2 pr-4">
-                          <div className="h-12 w-12 relative rounded-md overflow-hidden bg-muted">
-                            {p.primaryImage ? (
-                              <Image
-                                src={buildImageUrl(p.primaryImage)}
-                                alt={p.title}
-                                fill
-                                sizes="48px"
-                                className="object-cover"
-                              />
-                            ) : (
-                              <div className="h-full w-full flex items-center justify-center text-muted-foreground">
-                                <ImageIcon className="h-5 w-5" />
-                              </div>
-                            )}
-                          </div>
-                        </td>
-                        <td className="py-2 pr-4 font-medium">{p.title}</td>
-                        <td className="py-2 pr-4">{p.category?.name}</td>
-                        <td className="py-2 pr-4">{p.price}</td>
-                        <td className="py-2 pr-4">{p.quantity}</td>
-                        <td className="py-2 pr-4">
-                          <div className="flex items-center justify-end gap-2">
-                            <EditProductModal
-                              product={p}
-                              onProductUpdated={handleProductUpdate}
-                            />
-                            <DeleteProductButton
-                              productId={p.id}
-                              productTitle={p.title}
-                              onProductDeleted={handleProductUpdate}
-                            />
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Pagination Controls */}
-              {pagination && pagination.totalPages > 1 && (
-                <div className="flex items-center justify-between mt-6 pt-4 border-t">
-                  <div className="text-sm text-muted-foreground">
-                    Showing page {pagination.currentPage} of{" "}
-                    {pagination.totalPages} ({pagination.totalItems} total
-                    products)
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handlePreviousPage}
-                      disabled={!pagination.hasPreviousPage || loading}
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                      Previous
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleNextPage}
-                      disabled={!pagination.hasNextPage || loading}
-                    >
-                      Next
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              )}
+              <ProductsTable
+                products={products}
+                onProductUpdate={handleProductUpdate}
+              />
+              <ProductsPagination
+                pagination={pagination}
+                loading={productsLoading}
+                onPreviousPage={handlePreviousPage}
+                onNextPage={handleNextPage}
+              />
             </>
           )}
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+/**
+ * Page header component
+ */
+function PageHeader({
+  searchQuery,
+  onSearchChange,
+  onProductAdded,
+}: {
+  searchQuery: string;
+  onSearchChange: (value: string) => void;
+  onProductAdded: () => void;
+}) {
+  return (
+    <div className="flex items-center justify-between">
+      <div>
+        <h2 className="text-3xl font-bold tracking-tight">Products</h2>
+        <p className="text-muted-foreground">
+          Manage your product inventory and listings
+        </p>
+      </div>
+      <div className="flex items-center gap-3">
+        <ProductsSearch
+          searchQuery={searchQuery}
+          onSearchChange={onSearchChange}
+        />
+        <AddProductModal onProductAdded={onProductAdded} />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Loading state component
+ */
+function LoadingState() {
+  return (
+    <div className="flex items-center justify-center py-12">
+      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+    </div>
+  );
+}
+
+/**
+ * Error state component
+ */
+function ErrorState({
+  error,
+  onRetry,
+}: {
+  error: Error | null;
+  onRetry: () => void;
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center py-12 gap-4">
+      <p className="text-destructive">
+        {error?.message || "An error occurred while loading products"}
+      </p>
+      <button
+        onClick={onRetry}
+        className="text-sm text-primary hover:underline"
+      >
+        Try again
+      </button>
     </div>
   );
 }
