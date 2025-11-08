@@ -1,6 +1,6 @@
 "use client";
 
-import { productGateway } from "@/domain/gateways/products.gateway";
+import { productGateway } from "@/domain/gateways/customer/products.gateway";
 import { Category, Product } from "@/lib/types";
 import { useEffect, useState } from "react";
 import ProductCard from "./product-card";
@@ -9,7 +9,7 @@ import { getAllCategories } from "@/lib/data";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { Button } from "../ui/button";
 import { Car, SlidersHorizontal } from "lucide-react";
-import { categoriesGateway } from "@/domain/gateways/categories.gateway";
+import { categoriesGateway } from "@/domain/gateways/customer/categories.gateway";
 import { CardContent2 } from "../cards/card-content-2";
 
 const sortMappings: Record<string, any> = {
@@ -169,3 +169,4 @@ function Products2() {
 }
 
 export default Products2;
+

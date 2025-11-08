@@ -18,9 +18,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { useEffect, useState } from "react";
 import { OTPModal } from "../dialogs/opt-modal";
 import { OrderDetails, SavedAddress, User } from "@/lib/types";
-import { ordersGateway } from "@/domain/gateways/orders.gateway";
-import { userGateway } from "@/domain/gateways/user.gateway";
-import { useCart } from "@/hooks/use-cart";
+import { ordersGateway } from "@/domain/gateways/customer/orders.gateway";
+import { userGateway } from "@/domain/gateways/customer/user.gateway";
+import { useCart } from "@/hooks/customer/use-cart";
 import { useRouter } from "next/navigation";
 import { AlertDialog, useAlert } from "../shared/alerts";
 
@@ -301,106 +301,153 @@ export default function CheckoutForm({
   return (
     <div className="col-span-2 relative">
       {isSubmitting && (
-        <div className="absolute inset-0 flex items-center justify-center z-50 rounded-lg">
-          <div className="bg-white p-6 rounded-lg flex flex-col items-center gap-4">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-            <p className="text-lg font-medium">Processing your order...</p>
+        <div className="absolute inset-0 flex items-center justify-center z-50 rounded-lg bg-black/5 backdrop-blur-sm">
+          <div className="bg-white p-8 rounded-xl shadow-2xl flex flex-col items-center gap-4 border-2 border-purple-100">
+            <div className="animate-spin rounded-full h-14 w-14 border-b-4 border-purple-600"></div>
+            <p className="text-xl font-semibold text-gray-900">
+              Processing your order...
+            </p>
             <p className="text-sm text-gray-600">
               Please wait, this may take a moment.
             </p>
           </div>
         </div>
       )}
-      <h1 className="text-3xl font-bold mb-6">Checkout</h1>
+
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+          Checkout
+        </h1>
+        <p className="text-gray-600">Complete your order with confidence</p>
+      </div>
 
       {user && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-green-800">
-            <Check className="inline w-4 h-4 mr-2" />
-            Logged in as {user.firstName} {user.lastName}
+        <div className="mb-8 p-5 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl shadow-sm">
+          <p className="text-green-800 font-medium flex items-center">
+            <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3">
+              <Check className="w-5 h-5 text-white" />
+            </div>
+            <span>
+              <span className="font-semibold">Logged in as</span>{" "}
+              {user.firstName} {user.lastName}
+            </span>
           </p>
         </div>
       )}
 
-      <div className="bg-white rounded-lg shadow-md p-8">
-        <form className="space-y-6" onSubmit={handleProceed}>
+      <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 hover:shadow-2xl transition-shadow duration-300">
+        <form className="space-y-8" onSubmit={handleProceed}>
           {/* Personal Information */}
-          <div className="grid grid-cols-2 gap-6">
+          <div className="space-y-6">
+            <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
+              <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                <span className="text-purple-600 font-bold">1</span>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Personal Information
+              </h3>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <Label
+                  htmlFor="firstName"
+                  className="mb-2 font-medium text-gray-700"
+                >
+                  First Name
+                </Label>
+                <Input
+                  required
+                  value={orderDetails.firstName}
+                  onChange={(e) =>
+                    setOrderDetails({
+                      ...orderDetails,
+                      firstName: e.target.value,
+                    })
+                  }
+                  id="firstName"
+                  placeholder="Ali"
+                  disabled={!!user} // Disable for logged-in users
+                  className="transition-all duration-200 focus:ring-2 focus:ring-purple-500 border-gray-300"
+                />
+              </div>
+              <div>
+                <Label
+                  htmlFor="lastName"
+                  className="mb-2 font-medium text-gray-700"
+                >
+                  Last Name
+                </Label>
+                <Input
+                  required
+                  value={orderDetails.lastName}
+                  onChange={(e) =>
+                    setOrderDetails({
+                      ...orderDetails,
+                      lastName: e.target.value,
+                    })
+                  }
+                  id="lastName"
+                  placeholder="Ahmad"
+                  disabled={!!user} // Disable for logged-in users
+                  className="transition-all duration-200 focus:ring-2 focus:ring-purple-500 border-gray-300"
+                />
+              </div>
+            </div>
+
             <div>
-              <Label htmlFor="firstName">First Name</Label>
+              <Label htmlFor="email" className="mb-2 font-medium text-gray-700">
+                Email Address
+              </Label>
               <Input
                 required
-                value={orderDetails.firstName}
+                value={orderDetails.email}
                 onChange={(e) =>
-                  setOrderDetails({
-                    ...orderDetails,
-                    firstName: e.target.value,
-                  })
+                  setOrderDetails({ ...orderDetails, email: e.target.value })
                 }
-                id="firstName"
-                placeholder="Ali"
+                id="email"
+                type="email"
+                placeholder="name@example.com"
                 disabled={!!user} // Disable for logged-in users
+                className="transition-all duration-200 focus:ring-2 focus:ring-purple-500 border-gray-300"
               />
+              {user && (
+                <p className="text-sm text-green-600 mt-2 font-medium">
+                  ✓ Email verification not required for logged-in users
+                </p>
+              )}
             </div>
+
             <div>
-              <Label htmlFor="lastName">Last Name</Label>
+              <Label htmlFor="phone" className="mb-2 font-medium text-gray-700">
+                Phone Number
+              </Label>
               <Input
                 required
-                value={orderDetails.lastName}
+                value={orderDetails.phone}
                 onChange={(e) =>
-                  setOrderDetails({ ...orderDetails, lastName: e.target.value })
+                  setOrderDetails({ ...orderDetails, phone: e.target.value })
                 }
-                id="lastName"
-                placeholder="Ahmad"
-                disabled={!!user} // Disable for logged-in users
+                id="phone"
+                type="tel"
+                placeholder="+923XXXXXXXXX"
+                className="transition-all duration-200 focus:ring-2 focus:ring-purple-500 border-gray-300"
               />
             </div>
-          </div>
-
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              required
-              value={orderDetails.email}
-              onChange={(e) =>
-                setOrderDetails({ ...orderDetails, email: e.target.value })
-              }
-              id="email"
-              type="email"
-              placeholder="name@example.com"
-              disabled={!!user} // Disable for logged-in users
-            />
-            {user && (
-              <p className="text-sm text-gray-500 mt-1">
-                Email verification not required for logged-in users
-              </p>
-            )}
-          </div>
-
-          <div>
-            <Label htmlFor="phone">Phone Number</Label>
-            <Input
-              required
-              value={orderDetails.phone}
-              onChange={(e) =>
-                setOrderDetails({ ...orderDetails, phone: e.target.value })
-              }
-              id="phone"
-              type="tel"
-              placeholder="+923XXXXXXXXX"
-            />
           </div>
 
           {/* Saved Addresses Section for Logged-in Users */}
           {user && savedAddresses.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MapPin className="w-5 h-5" />
+            <Card className="border-2 border-gray-100 shadow-md">
+              <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-t-lg border-b-2 border-blue-100">
+                <CardTitle className="flex items-center gap-2 text-xl text-gray-900">
+                  <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                    <MapPin className="w-6 h-6 text-white" />
+                  </div>
                   Saved Addresses
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-6">
                 <div className="flex gap-4">
                   <div className="flex-1">
                     <Select
@@ -462,9 +509,23 @@ export default function CheckoutForm({
             savedAddresses.length === 0 ||
             showAddNewAddress ||
             !selectedSavedAddress) && (
-            <>
+            <div className="space-y-6 p-6 bg-gray-50 rounded-xl border-2 border-gray-100">
+              <div className="flex items-center gap-3 pb-2 border-b border-gray-200">
+                <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <span className="text-purple-600 font-bold">2</span>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Delivery Address
+                </h3>
+              </div>
+
               <div>
-                <Label htmlFor="address">Address</Label>
+                <Label
+                  htmlFor="address"
+                  className="mb-2 font-medium text-gray-700"
+                >
+                  Street Address
+                </Label>
                 <Textarea
                   required
                   value={orderDetails.address}
@@ -477,12 +538,18 @@ export default function CheckoutForm({
                   id="address"
                   rows={3}
                   placeholder="123 Main St, Anytown USA"
+                  className="transition-all duration-200 focus:ring-2 focus:ring-purple-500 border-gray-300"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <Label htmlFor="province">Province</Label>
+                  <Label
+                    htmlFor="province"
+                    className="mb-2 font-medium text-gray-700"
+                  >
+                    Province
+                  </Label>
                   <Input
                     required
                     value={orderDetails.province}
@@ -494,10 +561,16 @@ export default function CheckoutForm({
                     }
                     id="province"
                     placeholder="Punjab"
+                    className="transition-all duration-200 focus:ring-2 focus:ring-purple-500 border-gray-300"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="city">City</Label>
+                  <Label
+                    htmlFor="city"
+                    className="mb-2 font-medium text-gray-700"
+                  >
+                    City
+                  </Label>
                   <Input
                     required
                     value={orderDetails.city}
@@ -506,13 +579,19 @@ export default function CheckoutForm({
                     }
                     id="city"
                     placeholder="Lahore"
+                    className="transition-all duration-200 focus:ring-2 focus:ring-purple-500 border-gray-300"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <Label htmlFor="zip">Zip Code</Label>
+                  <Label
+                    htmlFor="zip"
+                    className="mb-2 font-medium text-gray-700"
+                  >
+                    Zip Code
+                  </Label>
                   <Input
                     required
                     value={orderDetails.zip}
@@ -521,10 +600,11 @@ export default function CheckoutForm({
                     }
                     id="zip"
                     placeholder="12345"
+                    className="transition-all duration-200 focus:ring-2 focus:ring-purple-500 border-gray-300"
                   />
                 </div>
               </div>
-            </>
+            </div>
           )}
 
           {/* Save Address Toggle - Only for logged-in users */}
@@ -575,23 +655,43 @@ export default function CheckoutForm({
             )}
 
           {/* Payment Method */}
-          <div>
-            <Label htmlFor="paymentType" className="mb-2 block">
-              Payment Method
+          <div className="space-y-4 p-6 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl border-2 border-purple-100">
+            <div className="flex items-center gap-3 pb-2 border-b border-purple-200">
+              <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold">3</span>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Payment Method
+              </h3>
+            </div>
+            <Label
+              htmlFor="paymentType"
+              className="mb-4 block text-sm font-medium text-gray-700"
+            >
+              Choose your preferred payment method
             </Label>
             <RadioGroup
               id="paymentType"
               defaultValue="cash"
               value={orderDetails.paymentMethod}
-              onValueChange={(value) => setOrderDetails({ ...orderDetails })}
+              onValueChange={(value: string) =>
+                setOrderDetails({
+                  ...orderDetails,
+                  paymentMethod: value as "cash",
+                })
+              }
             >
-              <div className="flex items-center gap-4">
-                <RadioGroupItem id="cash" value="cash" />
+              <div className="flex items-center gap-4 p-4 bg-white rounded-lg border-2 border-purple-300 shadow-sm hover:shadow-md transition-all duration-200">
+                <RadioGroupItem
+                  id="cash"
+                  value="cash"
+                  className="border-2 border-purple-500 w-5 h-5"
+                />
                 <Label
                   htmlFor="cash"
-                  className="flex items-center cursor-pointer"
+                  className="flex items-center cursor-pointer text-gray-900 font-medium"
                 >
-                  <Wallet className="h-6 w-6 mr-2" />
+                  <Wallet className="h-6 w-6 mr-3 text-purple-600" />
                   Cash On Delivery
                 </Label>
               </div>
@@ -599,8 +699,12 @@ export default function CheckoutForm({
             </RadioGroup>
           </div>
 
-          <div>
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
+          <div className="pt-4">
+            <Button
+              type="submit"
+              className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+              disabled={isSubmitting}
+            >
               {isSubmitting
                 ? "Processing..."
                 : user

@@ -6,7 +6,7 @@ import { User, ChevronDown } from "lucide-react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { useCart } from "@/hooks/use-cart";
+import { useCart } from "@/hooks/customer/use-cart";
 
 export default function UserMenu() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -81,3 +81,4 @@ export default function UserMenu() {
     </div>
   );
 }
+

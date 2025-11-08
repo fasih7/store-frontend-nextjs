@@ -15,11 +15,11 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
-import { authGateway } from "@/domain/gateways/auth.gateway";
+import { authGateway } from "@/domain/gateways/shared/auth.gateway";
 import TwitterIcon from "@/components/icons/TwitterIcon";
 import GoogleIcon from "@/components/icons/GoogleIcon";
 import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/shared/use-toast";
 import { OTPModal } from "@/components/dialogs/opt-modal";
 import { ForgotPasswordModal } from "@/components/dialogs/forgot-password-modal";
 
@@ -473,3 +473,4 @@ export default function AuthPage() {
     </div>
   );
 }
+

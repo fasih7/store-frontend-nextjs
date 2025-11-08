@@ -106,14 +106,24 @@ export class HttpClient {
   ): Promise<any> {
     const authHeader = await this.getAuthHeader();
 
+    const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
+
+    const requestHeaders: Record<string, string> = {
+      ...authHeader,
+      ...headers,
+    };
+
+    // Only set JSON content-type when not sending FormData
+    if (!isFormData) {
+      requestHeaders["Content-Type"] = "application/json";
+    }
+
+    const requestBody = isFormData ? (body as FormData) : body ? JSON.stringify(body) : undefined;
+
     const res = await fetch(`${this.baseUrl}${endpoint}`, {
       method,
-      headers: {
-        "Content-Type": "application/json",
-        ...authHeader,
-        ...headers,
-      },
-      body: body ? JSON.stringify(body) : undefined,
+      headers: requestHeaders,
+      body: requestBody,
     });
 
     return this.handleResponse(res);

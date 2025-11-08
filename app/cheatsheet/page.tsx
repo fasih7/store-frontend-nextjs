@@ -5,7 +5,7 @@ import CheatSheetPage from "../../components/shared/cheatsheet/cheetsheet";
 function CategoriesPage() {
   return (
     <>
-      <Navbar />
+      {/* <Navbar /> */}
       <CheatSheetPage />
       {/* <Footer /> */}
     </>

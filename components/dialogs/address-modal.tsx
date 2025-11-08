@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { AddressData } from "@/lib/validations";
 import { SavedAddress } from "@/lib/types";
-import { userGateway } from "@/domain/gateways/user.gateway";
+import { userGateway } from "@/domain/gateways/customer/user.gateway";
 import AddressForm from "@/components/forms/address-form";
 import { useAlert } from "@/components/shared/alerts";
 
@@ -87,3 +87,4 @@ export default function AddressModal({
     </Dialog>
   );
 }
+

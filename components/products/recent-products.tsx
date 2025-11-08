@@ -1,4 +1,4 @@
-import { productGateway } from "@/domain/gateways/products.gateway";
+import { productGateway } from "@/domain/gateways/customer/products.gateway";
 import { Product } from "@/lib/types";
 import { useState, useEffect } from "react";
 import ProductsSection from "./product-section";
@@ -54,3 +54,4 @@ function RecentProducts() {
 }
 
 export default RecentProducts;
+

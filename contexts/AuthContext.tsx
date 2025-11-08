@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 import Cookies from "js-cookie";
-import { authGateway } from "../domain/gateways/auth.gateway";
+import { authGateway } from "@/domain/gateways/shared/auth.gateway";
 
 type AuthContextType = {
   isLoggedIn: boolean;
